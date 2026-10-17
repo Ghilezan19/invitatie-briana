@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#141113">
+    <meta name="theme-color" content="#07060a">
     <title>🎃 Ziua Brianei — Halloween Party</title>
     <meta property="og:title" content="🎃 Ești invitat la ziua Brianei!">
     <meta property="og:description" content="Halloween Party · Sâmbătă, 31 octombrie 2026, ora 14:00">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="poster.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css">
     <style>
         /* ---------- Ușa de la intrare ---------- */
         .intro {
@@ -21,255 +21,280 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 4dvh;
+            gap: 3.5dvh;
             padding: 24px;
-            background: var(--orange);
-            color: var(--bg);
-            transition: opacity 0.6s ease 0.9s, visibility 0s linear 1.5s;
+            background:
+                radial-gradient(ellipse 60% 50% at 50% 45%, rgba(232, 100, 28, 0.18), transparent 70%),
+                #07060a;
+            transition: opacity 0.8s ease 1s, visibility 0s linear 1.8s;
         }
         .intro.gone { opacity: 0; visibility: hidden; }
-        .intro .mono { color: var(--bg); opacity: 0.75; text-align: center; }
-        .intro > .mono:first-child { margin-bottom: 2.2rem; }
+        .intro-pre { font-family: var(--serif); font-style: italic; font-size: 1.25rem; color: var(--muted); margin-bottom: 2.4rem; }
 
-        .house {
+        .door {
             position: relative;
-            width: min(58vw, 30dvh);
-            aspect-ratio: 0.62;
-            perspective: 900px;
+            width: min(56vw, 30dvh);
+            aspect-ratio: 0.6;
+            perspective: 1000px;
         }
-        .house .sign {
+        .door .arch {
             position: absolute;
-            top: -3.2rem; left: 50%;
-            transform: translateX(-50%) rotate(-4deg);
-            padding: 0.25rem 0.7rem;
-            background: var(--bg);
-            color: var(--lime);
-            border-radius: 6px;
-            font-family: var(--mono);
-            font-size: 0.8rem;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-        .frame {
-            position: absolute;
-            inset: 0;
-            border: 10px solid var(--bg);
+            inset: -10px;
+            border: 1px solid var(--line);
             border-bottom: none;
             border-radius: 999px 999px 0 0;
-            overflow: hidden;
-            background: #050405;
         }
-        .eyes {
+        .door .inside {
             position: absolute;
             inset: 0;
-            display: grid;
-            place-items: center;
-            font-size: min(12vw, 6dvh);
-            opacity: 0;
-            transition: opacity 0.4s ease 0.35s;
+            border-radius: 999px 999px 0 0;
+            overflow: hidden;
+            background: radial-gradient(ellipse at 50% 70%, #ffb45a 0%, #e8641c 25%, #3a1406 65%, #0b0507 100%);
+            box-shadow: 0 0 0 2px var(--gold-3);
         }
         .leaf {
             position: absolute;
             top: 0; bottom: 0;
             width: 50%;
-            background: #2a2125;
-            transition: transform 1s cubic-bezier(0.6, 0, 0.2, 1);
+            background:
+                repeating-linear-gradient(90deg, rgba(0,0,0,0.18) 0 2px, transparent 2px 18px),
+                linear-gradient(180deg, #3a2418, #1f120b);
+            transition: transform 1.3s cubic-bezier(0.65, 0, 0.25, 1);
         }
+        .leaf.l { left: 0; transform-origin: left center; border-radius: 999px 0 0 0 / 999px 0 0 0; box-shadow: inset -1px 0 0 #0b0604; }
+        .leaf.r { right: 0; transform-origin: right center; border-radius: 0 999px 0 0 / 0 999px 0 0; }
         .leaf::before {
             content: '';
             position: absolute;
-            inset: 14% 16% 10%;
-            border: 3px solid rgba(0, 0, 0, 0.35);
-            border-radius: 6px;
-            box-shadow: inset 0 0 0 6px rgba(255, 255, 255, 0.03);
+            inset: 22% 18% 8%;
+            border: 1px solid rgba(230, 177, 90, 0.35);
+            box-shadow: inset 0 0 0 4px rgba(0,0,0,0.25), inset 0 0 0 5px rgba(230, 177, 90, 0.18);
         }
-        .leaf.l { left: 0; transform-origin: left center; border-right: 2px solid #050405; }
-        .leaf.r { right: 0; transform-origin: right center; }
-        .leaf .knob {
+        .ring {
             position: absolute;
-            top: 55%;
-            width: 14px; height: 14px;
-            border-radius: 50%;
-            background: var(--lime);
-            box-shadow: 0 0 12px rgba(214, 255, 58, 0.6);
+            top: 50%;
+            width: 18px; height: 22px;
+            border: 2.5px solid var(--gold);
+            border-top-width: 3px;
+            border-radius: 50% 50% 45% 45%;
+            box-shadow: 0 0 10px rgba(230, 177, 90, 0.5);
         }
-        .leaf.l .knob { right: 10px; }
-        .leaf.r .knob { left: 10px; }
-
-        .intro.knock .house { animation: knock 0.5s ease 2; }
+        .leaf.l .ring { right: 8px; }
+        .leaf.r .ring { left: 8px; }
+        .door .num {
+            position: absolute;
+            top: -2.4rem; left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--display);
+            font-size: 0.85rem;
+            letter-spacing: 0.3em;
+            color: var(--gold);
+            white-space: nowrap;
+        }
+        .intro.knock .door { animation: knock 0.45s ease 2; }
         @keyframes knock {
             0%, 100% { transform: none; }
-            20% { transform: translateX(-4px) rotate(-1deg); }
-            40% { transform: translateX(4px) rotate(1deg); }
-            60% { transform: translateX(-3px); }
+            25% { transform: translateX(-3px) rotate(-0.6deg); }
+            50% { transform: translateX(3px) rotate(0.6deg); }
         }
-        .intro.open .leaf.l { transform: rotateY(-105deg); }
-        .intro.open .leaf.r { transform: rotateY(105deg); }
-        .intro.open .eyes { opacity: 1; }
+        .intro.open .leaf.l { transform: rotateY(-108deg); }
+        .intro.open .leaf.r { transform: rotateY(108deg); }
+        .intro.open .door .inside { box-shadow: 0 0 0 2px var(--gold-3), 0 0 120px 40px rgba(232, 120, 40, 0.45); transition: box-shadow 1s; }
 
         .toc {
             position: absolute;
-            right: -2.6rem; top: 34%;
-            font-family: var(--sans);
-            font-weight: 800;
+            right: -3.2rem; top: 40%;
+            font-family: var(--serif);
+            font-style: italic;
+            font-weight: 600;
             font-size: 1.3rem;
-            transform: rotate(12deg) scale(0);
-            transition: transform 0.2s;
+            color: var(--gold-2);
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.2s, transform 0.2s;
         }
-        .intro.knock .toc { transform: rotate(12deg) scale(1); }
-
-        .knock-btn {
-            width: auto;
-            gap: 0.8rem;
-            padding: 1rem 1.6rem;
-            background: var(--bg);
-            color: var(--lime);
-        }
-        .knock-btn:hover { background: #000; }
+        .intro.knock .toc { opacity: 1; transform: none; }
+        .knock-btn { width: auto; padding-inline: 2rem; }
         .skip {
             background: none; border: none;
-            color: var(--bg);
-            opacity: 0.6;
+            color: var(--muted);
             cursor: pointer;
-            text-decoration: underline;
         }
+        .skip:hover { color: var(--gold-2); }
 
-        /* ---------- Afișul ---------- */
+        /* ---------- Invitația ---------- */
+        .top { justify-content: center; color: var(--gold); }
+
+        .hero .orn { width: 100%; }
         .hero {
             flex: 1;
             min-height: 0;
             display: flex;
             flex-direction: column;
+            align-items: center;
             justify-content: center;
+            text-align: center;
         }
-        .eyebrow { color: var(--lime); margin-bottom: 0.4rem; }
-        .giant {
-            font-weight: 800;
-            font-stretch: 75%;
-            font-size: min(27vw, 16dvh, 10rem);
-            line-height: 0.82;
-            letter-spacing: 0;
-            text-transform: uppercase;
-        }
-        .giant .o { color: var(--orange); }
-        .lead {
-            margin-top: 1.4dvh;
-            max-width: 28ch;
-            font-size: clamp(0.95rem, 2.2dvh, 1.1rem);
+        .pre {
+            font-family: var(--serif);
+            font-style: italic;
+            font-weight: 500;
+            font-size: clamp(1.2rem, 3dvh, 1.6rem);
             color: var(--muted);
-            line-height: 1.35;
+        }
+        .name {
+            margin: 0.4dvh 0 1.4dvh;
+            font-family: var(--display);
+            font-weight: 700;
+            font-size: min(16vw, 10.5dvh, 6rem);
+            line-height: 1;
+            letter-spacing: 0.04em;
+            filter: drop-shadow(0 0 24px rgba(232, 140, 50, 0.35));
+        }
+        .tagline {
+            margin-top: 1.4dvh;
+            font-family: var(--serif);
+            font-style: italic;
+            font-size: clamp(1rem, 2.4dvh, 1.25rem);
+            color: var(--muted);
         }
 
         .cd {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            margin-top: 3.2dvh;
-            border-top: 1px solid var(--faint);
-            border-bottom: 1px solid var(--faint);
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 0.4rem;
+            margin-top: 3.5dvh;
         }
-        .cd div { padding: 1.2dvh 0.2rem; text-align: center; }
-        .cd div + div { border-left: 1px solid var(--faint); }
+        .cd .u { min-width: 3.6rem; }
         .cd b {
             display: block;
-            font-weight: 700;
-            font-size: min(9vw, 5dvh, 2.4rem);
+            font-family: var(--display);
+            font-weight: 500;
+            font-size: min(9vw, 5.4dvh, 2.6rem);
             line-height: 1;
+            color: var(--ink);
             font-variant-numeric: tabular-nums;
         }
-        .cd span { color: var(--muted); }
-        .cd-done {
-            grid-column: 1 / -1;
-            padding: 1.4dvh 0;
-            text-align: center;
-            font-weight: 800;
-            font-size: 1.3rem;
-            color: var(--lime);
-        }
+        .cd .caps { display: block; margin-top: 0.5rem; color: var(--gold); font-size: 0.56rem; }
+        .cd .sep { font-family: var(--display); font-size: min(7vw, 4dvh, 2rem); line-height: 1.1; color: var(--line); }
+        .cd-done { font-family: var(--serif); font-style: italic; font-size: 1.5rem; color: var(--gold-2); }
 
-        .facts {
+        .details {
             display: grid;
-            grid-template-columns: 1fr 1fr 1.3fr;
-            gap: 0.5rem;
-            margin: 2dvh 0;
+            grid-template-columns: repeat(3, 1fr);
+            margin: 3.5dvh 0 3dvh;
+            padding: 2.2dvh 0.4rem;
         }
-        .fact { padding: 0.2rem 0; }
-        .fact .mono { display: block; color: var(--muted); margin-bottom: 0.15rem; font-size: 0.65rem; }
-        .fact b { font-size: clamp(1rem, 2.6dvh, 1.25rem); font-weight: 700; line-height: 1.15; }
+        .d { text-align: center; padding: 0 0.3rem; }
+        .d + .d { border-left: 1px solid var(--faint); }
+        .d svg { width: 22px; height: 22px; color: var(--gold); margin-bottom: 0.7dvh; }
+        .d .caps { display: block; color: var(--muted); font-size: 0.55rem; margin-bottom: 0.35rem; }
+        .d b {
+            display: block;
+            font-family: var(--serif);
+            font-weight: 600;
+            font-size: clamp(1.05rem, 2.5dvh, 1.3rem);
+            line-height: 1.15;
+        }
 
-        .marquee { margin-top: 3.2dvh; }
+        .deadline {
+            margin-top: 1.4dvh;
+            text-align: center;
+            font-family: var(--serif);
+            font-style: italic;
+            font-size: 1rem;
+            color: var(--muted);
+        }
+        .deadline b { font-style: normal; font-weight: 600; color: var(--gold-2); }
 
-        .deadline { margin-top: 0.9dvh; text-align: center; color: var(--muted); font-size: 0.66rem; }
-        .deadline b { color: var(--lime); font-weight: 700; }
-
-        @media (max-height: 640px) {
-            .lead { display: none; }
-            .marquee { margin-top: 2dvh; }
-            .btn { padding: 0.8rem 1.1rem; }
+        @media (max-height: 660px) {
+            .tagline { display: none; }
+            .details { margin: 2.4dvh 0 2dvh; padding: 1.6dvh 0.4rem; }
+            .d svg { display: none; }
+            .btn { padding: 0.9rem 1.2rem; }
         }
     </style>
 </head>
 <body>
 
 <div class="intro" id="intro">
-    <p class="mono">cineva te așteaptă înăuntru…</p>
-    <div class="house" aria-hidden="true">
-        <span class="sign">NR. 31 · BRIANA</span>
-        <div class="frame">
-            <div class="eyes">👀</div>
-            <div class="leaf l"><span class="knob"></span></div>
-            <div class="leaf r"><span class="knob"></span></div>
+    <p class="intro-pre">Cineva te așteaptă înăuntru…</p>
+    <div class="door" aria-hidden="true">
+        <span class="num">Nº 31</span>
+        <div class="arch"></div>
+        <div class="inside">
+            <div class="leaf l"><span class="ring"></span></div>
+            <div class="leaf r"><span class="ring"></span></div>
         </div>
-        <span class="toc">TOC!<br>TOC!</span>
+        <span class="toc">toc, toc…</span>
     </div>
-    <button type="button" class="btn knock-btn" id="knockBtn">Ciocănește la ușă <span class="arr">👊</span></button>
-    <button type="button" class="skip mono" id="skipBtn">sari peste</button>
+    <button type="button" class="btn knock-btn" id="knockBtn">Ciocănește la ușă</button>
+    <button type="button" class="skip caps" id="skipBtn">sari peste</button>
 </div>
 
 <main class="screen">
-    <div class="bar mono">
-        <span>🎃 Halloween Party</span>
-        <span>31.10.2026</span>
+    <div class="bar top caps">
+        <div class="orn" style="width:100%">
+            <span>Halloween Party</span>
+        </div>
     </div>
 
     <section class="hero">
-        <p class="eyebrow mono">Ești invitat la ziua</p>
-        <h1 class="giant">Bria<span class="o">nei</span></h1>
-        <p class="lead">O după-amiază cu costume, dulciuri și monștri prietenoși. Nu lipsi!</p>
-
-        <div class="marquee" aria-hidden="true">
-            <div class="track" id="track"></div>
+        <p class="pre">Ești invitat la ziua</p>
+        <h1 class="name gold-text">Brianei</h1>
+        <div class="orn" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 6c-.3-1.6.4-3 1.8-3.6"/>
+                <path d="M12 6c-4.5 0-8 3-8 7s3.5 7 8 7 8-3 8-7-3.5-7-8-7z"/>
+                <path d="M12 6c-2 0-3.5 3-3.5 7s1.5 7 3.5 7 3.5-3 3.5-7-1.5-7-3.5-7z"/>
+            </svg>
         </div>
+        <p class="tagline">o după-amiază cu costume, dulciuri și puțină magie</p>
 
         <div class="cd" id="cd" aria-label="Timp rămas până la petrecere">
-            <div><b id="cdD">--</b><span class="mono">zile</span></div>
-            <div><b id="cdH">--</b><span class="mono">ore</span></div>
-            <div><b id="cdM">--</b><span class="mono">min</span></div>
-            <div><b id="cdS">--</b><span class="mono">sec</span></div>
+            <div class="u"><b id="cdD">--</b><span class="caps">zile</span></div>
+            <span class="sep">·</span>
+            <div class="u"><b id="cdH">--</b><span class="caps">ore</span></div>
+            <span class="sep">·</span>
+            <div class="u"><b id="cdM">--</b><span class="caps">minute</span></div>
+            <span class="sep">·</span>
+            <div class="u"><b id="cdS">--</b><span class="caps">secunde</span></div>
         </div>
 
-        <div class="facts">
-            <div class="fact"><span class="mono">Sâmbătă</span><b>31 oct.</b></div>
-            <div class="fact"><span class="mono">Ora</span><b>14:00</b></div>
-            <div class="fact"><span class="mono">Dress code</span><b>Costum de Halloween</b></div>
+        <div class="details frame" style="width:100%">
+            <i class="c1"></i><i class="c2"></i>
+            <div class="d">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="1.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>
+                <span class="caps">Sâmbătă</span>
+                <b>31 Octombrie</b>
+            </div>
+            <div class="d">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg>
+                <span class="caps">Ora</span>
+                <b>14:00</b>
+            </div>
+            <div class="d">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8c3-1.5 6-1.5 9 0 3-1.5 6-1.5 9 0 0 5-2 9-5 9-2 0-3-1.5-4-3-1 1.5-2 3-4 3-3 0-5-4-5-9z"/><path d="M7 11.5c.8-.6 1.8-.6 2.6 0M14.4 11.5c.8-.6 1.8-.6 2.6 0"/></svg>
+                <span class="caps">Dress code</span>
+                <b>Costum de Halloween</b>
+            </div>
         </div>
     </section>
 
     <a href="confirma/" class="btn">Confirmă prezența <span class="arr">→</span></a>
-    <p class="deadline mono">Vă rugăm să confirmați până pe <b>28.10.2026</b></p>
+    <p class="deadline">Vă rugăm să confirmați până pe <b>28 octombrie 2026</b></p>
 </main>
 
+<script src="atmosphere.js"></script>
 <script>
-    // Banda cu text
-    const phrase = 'Halloween party ✦ 31 octombrie ✦ ora 14:00 ✦ costume obligatorii ✦ dulciuri ✦ ';
-    document.getElementById('track').textContent = phrase.repeat(6);
-
     // Numărătoare inversă (ora României, UTC+2 după 25 octombrie)
     const PARTY = new Date('2026-10-31T14:00:00+02:00').getTime();
     const pad = n => String(n).padStart(2, '0');
     function tick() {
         const left = PARTY - Date.now();
         if (left <= 0) {
-            document.getElementById('cd').innerHTML = '<p class="cd-done">Petrecerea a început! 🎉</p>';
+            document.getElementById('cd').innerHTML = '<p class="cd-done">Petrecerea a început!</p>';
             return;
         }
         const s = Math.floor(left / 1000);
@@ -285,9 +310,7 @@
     const intro = document.getElementById('intro');
     let seen = false;
     try { seen = sessionStorage.getItem('briana-door') === '1'; } catch (e) {}
-    if (seen || matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        intro.remove();
-    }
+    if (seen || matchMedia('(prefers-reduced-motion: reduce)').matches) intro.remove();
 
     function openDoor(fast) {
         try { sessionStorage.setItem('briana-door', '1'); } catch (e) {}
@@ -296,8 +319,8 @@
         setTimeout(() => {
             intro.classList.remove('knock');
             intro.classList.add('open', 'gone');
-            setTimeout(() => intro.remove(), 1600);
-        }, 1000);
+            setTimeout(() => intro.remove(), 1900);
+        }, 950);
     }
     document.getElementById('knockBtn')?.addEventListener('click', () => openDoor(false), { once: true });
     document.getElementById('skipBtn')?.addEventListener('click', () => openDoor(true));

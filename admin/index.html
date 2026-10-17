@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex">
     <title>Admin — Ziua Brianei</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #141113; color: #f6f0e6; padding: 2rem 1rem; font-family: 'Bricolage Grotesque', system-ui, sans-serif; }
+        body { background: #07060a; color: #f6f0e6; padding: 2rem 1rem; font-family: 'Manrope', system-ui, sans-serif; }
         .container { max-width: 960px; margin: 0 auto; }
-        h1 { margin-bottom: 1.5rem; font-weight: 800; font-stretch: 80%; font-size: 2.6rem; letter-spacing: -0.02em; }
+        h1 { margin-bottom: 1.5rem; font-family: 'Cinzel', serif; font-weight: 700; font-size: 2rem; color: #e6b15a; }
 
         #loginBlock { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 5rem; }
         #loginBlock input { padding: 0.8rem 1rem; font: inherit; border-radius: 12px; border: 1.5px solid rgba(246,240,230,0.2); background: #1e1a1d; color: #f6f0e6; outline: none; }
-        #loginBlock input:focus { border-color: #d6ff3a; }
-        #loginBlock button { padding: 0.8rem 1.3rem; font: inherit; font-weight: 800; border-radius: 12px; border: none; background: #d6ff3a; color: #141113; cursor: pointer; }
-        #loginErr { width: 100%; text-align: center; color: #ff5b1f; display: none; font-family: 'Space Mono', monospace; font-size: 0.8rem; }
+        #loginBlock input:focus { border-color: #e6b15a; }
+        #loginBlock button { padding: 0.8rem 1.3rem; font: inherit; font-weight: 800; border-radius: 12px; border: none; background: #e6b15a; color: #07060a; cursor: pointer; }
+        #loginErr { width: 100%; text-align: center; color: #e8641c; display: none; font-family: 'Manrope', sans-serif; font-size: 0.8rem; }
 
         #adminBlock { display: none; }
 
@@ -24,27 +24,27 @@
         .stat { padding: 0.9rem 0.8rem; }
         .stat + .stat { border-left: 1px solid rgba(246,240,230,0.14); }
         .stat b { display: block; font-size: 2.2rem; font-weight: 800; line-height: 1; }
-        .stat:nth-child(1) b { color: #d6ff3a; }
-        .stat:nth-child(4) b { color: #ff5b1f; }
-        .stat span { font-family: 'Space Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(246,240,230,0.55); }
+        .stat:nth-child(1) b { color: #e6b15a; }
+        .stat:nth-child(4) b { color: #e8641c; }
+        .stat span { font-family: 'Manrope', sans-serif; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(246,240,230,0.55); }
         @media (max-width: 560px) { .stats { grid-template-columns: 1fr 1fr; } .stat:nth-child(3) { border-left: none; } }
 
         .table-wrap { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 0.8rem 0.6rem; text-align: left; border-bottom: 1px solid rgba(246,240,230,0.1); vertical-align: middle; }
-        th { font-family: 'Space Mono', monospace; font-size: 0.68rem; font-weight: 400; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(246,240,230,0.55); white-space: nowrap; }
+        th { font-family: 'Manrope', sans-serif; font-size: 0.68rem; font-weight: 400; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(246,240,230,0.55); white-space: nowrap; }
         td.num { text-align: center; font-weight: 700; }
 
         .btn { padding: 0.45rem 0.8rem; border: none; border-radius: 8px; cursor: pointer; font: inherit; font-size: 0.85rem; font-weight: 700; margin: 0.1rem; }
         .btn-edit { background: #2a2528; color: #f6f0e6; }
-        .btn-del { background: transparent; color: #ff5b1f; border: 1px solid rgba(255,91,31,0.4); }
-        .btn-save { background: #d6ff3a; color: #141113; }
+        .btn-del { background: transparent; color: #e8641c; border: 1px solid rgba(255,91,31,0.4); }
+        .btn-save { background: #e6b15a; color: #07060a; }
         .btn-cancel { background: #2a2528; color: #f6f0e6; }
 
-        .edit-mode { padding: 0.4rem; width: 100%; background: #1e1a1d; border: 1.5px solid #d6ff3a; color: #f6f0e6; border-radius: 8px; font: inherit; }
+        .edit-mode { padding: 0.4rem; width: 100%; background: #1e1a1d; border: 1.5px solid #e6b15a; color: #f6f0e6; border-radius: 8px; font: inherit; }
         input.edit-mode[type=number] { width: 4rem; }
 
-        #statusMsg { text-align: center; margin-bottom: 1rem; font-family: 'Space Mono', monospace; font-size: 0.8rem; min-height: 1.2em; }
+        #statusMsg { text-align: center; margin-bottom: 1rem; font-family: 'Manrope', sans-serif; font-size: 0.8rem; min-height: 1.2em; }
     </style>
 </head>
 <body>
@@ -108,14 +108,14 @@
     }
 
     async function loadData() {
-        status('Se încarcă...', '#d6ff3a');
+        status('Se încarcă...', '#e6b15a');
         try {
             currentData = (await loadGuests()).data;
             status('', '');
             renderTable();
         } catch (e) {
             console.error(e);
-            status('Eroare la încărcare!', '#ff5b1f');
+            status('Eroare la încărcare!', '#e8641c');
         }
     }
 
@@ -207,15 +207,15 @@
     }
 
     async function save(change, message) {
-        status('Se salvează...', '#d6ff3a');
+        status('Se salvează...', '#e6b15a');
         try {
             currentData = await updateGuests(change, message);
             renderTable();
-            status('✅ Modificările au fost salvate!', '#d6ff3a');
+            status('✅ Modificările au fost salvate!', '#e6b15a');
             setTimeout(() => status('', ''), 3000);
         } catch (err) {
             console.error(err);
-            status('❌ Eroare la salvare!', '#ff5b1f');
+            status('❌ Eroare la salvare!', '#e8641c');
             loadData();
         }
     }

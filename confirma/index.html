@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#141113">
+    <meta name="theme-color" content="#07060a">
     <title>🎃 Confirmă prezența — Ziua Brianei</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../poster.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../theme.css">
     <style>
-        .progress { height: 3px; margin-top: 0.7rem; background: var(--faint); border-radius: 3px; overflow: hidden; }
-        .progress i { display: block; height: 100%; width: 25%; background: var(--lime); transition: width 0.35s ease; }
+        .progress { height: 1px; margin-top: 0.9rem; background: var(--faint); }
+        .progress i { display: block; height: 100%; width: 25%; background: var(--gold-grad); box-shadow: 0 0 8px rgba(230, 177, 90, 0.7); transition: width 0.4s ease; }
+        #stepNo { font-family: var(--display); letter-spacing: 0.2em; color: var(--gold); }
 
         .wizard { position: relative; flex: 1; min-height: 0; }
 
@@ -23,179 +24,190 @@
             justify-content: center;
             opacity: 0;
             visibility: hidden;
-            transform: translateX(24px);
-            transition: opacity 0.3s, transform 0.3s, visibility 0s linear 0.3s;
+            transform: translateY(14px);
+            transition: opacity 0.35s, transform 0.35s, visibility 0s linear 0.35s;
         }
-        .step.active {
-            opacity: 1;
-            visibility: visible;
-            transform: none;
-            transition: opacity 0.3s, transform 0.3s;
-        }
-        .step.left { transform: translateX(-24px); }
+        .step.active { opacity: 1; visibility: visible; transform: none; transition: opacity 0.35s, transform 0.35s; }
+        .step.left { transform: translateY(-14px); }
 
-        .qno { color: var(--lime); margin-bottom: 0.7rem; }
+        .qno { color: var(--gold); margin-bottom: 1rem; }
         .q {
-            font-weight: 800;
-            font-stretch: 80%;
-            font-size: min(13vw, 8dvh, 4.2rem);
-            line-height: 0.92;
-            letter-spacing: -0.025em;
-            margin-bottom: 3dvh;
+            font-family: var(--serif);
+            font-weight: 500;
+            font-style: italic;
+            font-size: min(12vw, 7.5dvh, 3.6rem);
+            line-height: 1.02;
+            margin-bottom: 3.5dvh;
         }
-        .q .o { color: var(--orange); }
+        .q .o {
+            font-style: normal;
+            font-family: var(--display);
+            font-weight: 700;
+            font-size: 0.82em;
+            letter-spacing: 0.02em;
+            background: var(--gold-grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
 
         .line-input {
             width: 100%;
-            padding: 0.4rem 0 0.6rem;
+            padding: 0.4rem 0 0.7rem;
             border: none;
-            border-bottom: 2px solid var(--faint);
-            background: transparent;
-            color: var(--fg);
-            font-family: var(--sans);
-            font-size: min(8vw, 4.4dvh, 2.2rem);
-            font-weight: 600;
-            outline: none;
+            border-bottom: 1px solid var(--line);
             border-radius: 0;
+            background: transparent;
+            color: var(--ink);
+            font-family: var(--serif);
+            font-size: min(8vw, 4.6dvh, 2.2rem);
+            font-weight: 500;
+            outline: none;
             transition: border-color 0.2s;
         }
-        .line-input:focus { border-color: var(--lime); }
-        .line-input::placeholder { color: rgba(246, 240, 230, 0.2); }
-        textarea.line-input { resize: none; height: 18dvh; line-height: 1.25; font-size: min(6vw, 3.2dvh, 1.5rem); }
-        .hint { margin-top: 0.8rem; color: var(--muted); font-size: 0.65rem; }
+        .line-input:focus { border-color: var(--gold); }
+        .line-input::placeholder { color: rgba(243, 233, 216, 0.22); font-style: italic; }
+        textarea.line-input { resize: none; height: 17dvh; line-height: 1.25; font-size: min(6vw, 3.4dvh, 1.6rem); }
+        .hint { margin-top: 1rem; color: var(--muted); font-size: 0.56rem; }
 
-        .big-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+        .big-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
         .bigc {
+            position: relative;
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 2dvh;
-            min-height: min(34vw, 22dvh);
+            align-items: center;
+            justify-content: center;
+            gap: 1.4dvh;
+            min-height: min(40vw, 22dvh);
             padding: 1rem;
-            border: 1.5px solid var(--faint);
-            border-radius: 18px;
-            background: var(--bg-2);
-            color: var(--fg);
-            font-family: var(--sans);
-            font-size: min(7vw, 4dvh, 1.9rem);
-            font-weight: 800;
-            text-align: left;
+            border: 1px solid var(--line);
+            background: var(--panel);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            color: var(--ink);
+            font-family: var(--display);
+            font-size: min(5.5vw, 3.2dvh, 1.4rem);
+            font-weight: 700;
+            letter-spacing: 0.08em;
             cursor: pointer;
-            transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
+            transition: background 0.25s, color 0.25s, border-color 0.25s, transform 0.15s, box-shadow 0.25s;
             -webkit-tap-highlight-color: transparent;
         }
         .bigc .e { font-size: min(10vw, 5.5dvh, 2.6rem); line-height: 1; }
-        .bigc:hover { border-color: var(--muted); }
+        .bigc:hover { border-color: var(--gold); }
         .bigc:active { transform: scale(0.97); }
-        .bigc[data-r="yes"].on { background: var(--lime); color: var(--bg); border-color: var(--lime); }
-        .bigc[data-r="no"].on { background: var(--orange); color: var(--bg); border-color: var(--orange); }
+        .bigc.on { background: var(--gold-grad); color: #1a1006; border-color: transparent; box-shadow: 0 10px 40px rgba(232, 140, 50, 0.35); }
+        .bigc[data-r="no"].on { background: linear-gradient(135deg, #5a4a52, #2c2329); color: var(--ink); box-shadow: none; }
 
-        .counters { display: grid; gap: 0.6rem; }
+        .counters { display: grid; }
         .counter {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0.4rem 0;
+            padding: 1.6dvh 0;
             border-bottom: 1px solid var(--faint);
         }
-        .counter .who b { display: block; font-size: min(6.5vw, 3.6dvh, 1.7rem); font-weight: 800; line-height: 1; }
-        .counter .who span { display: block; margin-top: 0.3rem; color: var(--muted); font-size: 0.62rem; }
-        .stepper { display: flex; align-items: center; gap: 0.6rem; }
+        .counter:first-child { border-top: 1px solid var(--faint); }
+        .counter .who b { display: block; font-family: var(--serif); font-size: min(7vw, 3.8dvh, 1.8rem); font-weight: 600; line-height: 1; }
+        .counter .who span { display: block; margin-top: 0.4rem; color: var(--gold); font-size: 0.54rem; }
+        .stepper { display: flex; align-items: center; gap: 0.7rem; }
         .stepper button {
-            width: 46px; height: 46px;
-            border: 1.5px solid var(--faint);
+            width: 44px; height: 44px;
+            border: 1px solid var(--line);
             border-radius: 50%;
             background: transparent;
-            color: var(--fg);
+            color: var(--gold-2);
             font-family: var(--sans);
-            font-size: 1.5rem;
-            font-weight: 600;
+            font-size: 1.3rem;
+            font-weight: 500;
             line-height: 1;
             cursor: pointer;
             touch-action: manipulation;
-            transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+            transition: background 0.15s, border-color 0.15s, transform 0.1s;
         }
-        .stepper button[data-step="1"] { background: var(--lime); color: var(--bg); border-color: var(--lime); }
+        .stepper button:hover:not(:disabled) { border-color: var(--gold); background: rgba(230, 177, 90, 0.08); }
+        .stepper button[data-step="1"] { background: var(--gold-grad); color: #1a1006; border-color: transparent; }
         .stepper button:active:not(:disabled) { transform: scale(0.9); }
         .stepper button:disabled { opacity: 0.25; cursor: default; }
         .stepper output {
-            min-width: 2.4ch;
+            min-width: 2ch;
             text-align: center;
-            font-weight: 800;
-            font-size: min(11vw, 6.5dvh, 3rem);
+            font-family: var(--display);
+            font-weight: 500;
+            font-size: min(10vw, 6dvh, 2.8rem);
             line-height: 1;
             font-variant-numeric: tabular-nums;
         }
-        .sum { margin-top: 2dvh; color: var(--muted); font-size: 0.68rem; line-height: 1.6; }
-        .sum b { color: var(--lime); font-weight: 700; }
+        .sum { margin-top: 2.4dvh; font-family: var(--serif); font-style: italic; font-size: 1.1rem; color: var(--muted); line-height: 1.4; }
+        .sum b { font-style: normal; font-weight: 600; color: var(--gold-2); }
 
         .nav { display: grid; grid-template-columns: 56px 1fr; gap: 0.6rem; }
-        .nav .back-btn { justify-content: center; padding: 0; font-size: 1.3rem; }
+        .nav .back-btn { padding: 0; font-size: 1.1rem; letter-spacing: 0; }
         .nav.solo { grid-template-columns: 1fr; }
         .nav.solo .back-btn { display: none; }
         .nav.hidden { display: none; }
 
-        .err { display: none; margin-bottom: 0.6rem; color: var(--orange); text-align: center; }
+        .err { display: none; margin-bottom: 0.7rem; color: #ff9a6a; text-align: center; }
         .err.show { display: block; }
 
         .wall-link {
-            margin-top: 0.8rem;
+            margin-top: 1rem;
             background: none;
             border: none;
             color: var(--muted);
             cursor: pointer;
             align-self: center;
+            transition: color 0.2s;
         }
-        .wall-link:hover { color: var(--lime); }
-        .wall-link b { color: var(--fg); }
+        .wall-link:hover { color: var(--gold-2); }
+        .wall-link b { color: var(--gold); }
 
         /* Gata */
-        .done .q { font-size: min(16vw, 10dvh, 5rem); }
-        .done p.txt { font-size: clamp(1rem, 2.4dvh, 1.2rem); color: var(--muted); max-width: 30ch; line-height: 1.4; }
-        .done .again { margin-top: 2dvh; background: none; border: none; color: var(--muted); cursor: pointer; text-decoration: underline; align-self: flex-start; }
-        .done .btn { margin-top: 3dvh; }
+        .done { align-items: center; text-align: center; }
+        .done .q { font-size: min(13vw, 8dvh, 4rem); }
+        .done p.txt { font-family: var(--serif); font-size: clamp(1.1rem, 2.6dvh, 1.35rem); color: var(--muted); max-width: 28ch; line-height: 1.4; }
+        .done .btn { margin-top: 4dvh; }
+        .done .again { margin-top: 2dvh; background: none; border: none; color: var(--muted); cursor: pointer; }
+        .done .again:hover { color: var(--gold-2); }
 
         .burst { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 30; }
-        .burst span { position: absolute; top: 55%; left: 50%; font-size: 1.8rem; animation: fly 1.4s cubic-bezier(0.1, 0.7, 0.3, 1) forwards; }
-        @keyframes fly {
-            to { transform: translate(var(--x), var(--y)) rotate(var(--r)); opacity: 0; }
-        }
+        .burst span { position: absolute; top: 50%; left: 50%; font-size: 1.6rem; animation: burst 1.6s cubic-bezier(0.1, 0.7, 0.3, 1) forwards; }
+        @keyframes burst { to { transform: translate(var(--x), var(--y)) rotate(var(--r)); opacity: 0; } }
 
         /* Lista de monștri */
         .wall {
             position: fixed;
             inset: 0;
             z-index: 20;
-            display: flex;
-            flex-direction: column;
-            background: var(--bg);
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
+            background: rgba(7, 6, 10, 0.94);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.35s, visibility 0s linear 0.35s;
         }
-        .wall.show { transform: none; }
+        .wall.show { opacity: 1; visibility: visible; transition: opacity 0.35s; }
         .wall .screen { height: 100%; width: 100%; }
-        .wall-head { display: flex; align-items: flex-end; justify-content: space-between; margin: 2dvh 0 1.5dvh; }
-        .wall-head h2 { font-weight: 800; font-stretch: 80%; font-size: min(12vw, 7dvh, 3.6rem); line-height: 0.9; letter-spacing: -0.02em; }
-        .wall-head h2 .o { color: var(--orange); }
+        .wall-head { display: flex; align-items: center; justify-content: space-between; margin: 3dvh 0 2.5dvh; }
+        .wall-head h2 { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: min(10vw, 6dvh, 3rem); line-height: 1; }
+        .wall-head h2 .o { font-family: var(--display); font-style: normal; font-weight: 700; font-size: 0.85em; background: var(--gold-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .close {
             width: 44px; height: 44px; flex-shrink: 0;
-            border: 1.5px solid var(--faint);
+            border: 1px solid var(--line);
             border-radius: 50%;
             background: transparent;
-            color: var(--fg);
-            font-size: 1.4rem;
+            color: var(--gold-2);
+            font-size: 1.3rem;
             cursor: pointer;
         }
-        .close:hover { border-color: var(--lime); color: var(--lime); }
+        .close:hover { border-color: var(--gold); }
 
-        .totals { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--faint); border-bottom: 1px solid var(--faint); }
-        .totals div { padding: 1.2dvh 0.3rem; }
-        .totals div + div { border-left: 1px solid var(--faint); padding-left: 0.8rem; }
-        .totals b { display: block; font-size: min(10vw, 5.5dvh, 2.6rem); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
-        .totals div:nth-child(1) b { color: var(--lime); }
-        .totals div:nth-child(3) b { color: var(--orange); }
-        .totals span { color: var(--muted); font-size: 0.62rem; }
+        .totals { display: grid; grid-template-columns: repeat(3, 1fr); padding: 1.8dvh 0.4rem; }
+        .totals div { text-align: center; }
+        .totals div + div { border-left: 1px solid var(--faint); }
+        .totals b { display: block; font-family: var(--display); font-weight: 500; font-size: min(9vw, 5dvh, 2.4rem); line-height: 1; }
+        .totals div:nth-child(1) b { color: var(--gold-2); }
+        .totals span { display: block; margin-top: 0.4rem; color: var(--muted); font-size: 0.54rem; }
 
         .tiles {
             flex: 1;
@@ -205,34 +217,33 @@
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             align-content: start;
             gap: 0.6rem;
-            padding: 1.5dvh 0 0.5rem;
+            padding: 2dvh 0 0.5rem;
             -webkit-overflow-scrolling: touch;
         }
         .tile {
-            padding: 0.8rem;
-            border-radius: 16px;
-            background: var(--bg-2);
+            padding: 0.9rem 0.9rem 0.8rem;
             border: 1px solid var(--faint);
-            animation: rise 0.35s ease both;
+            background: rgba(20, 15, 22, 0.7);
+            animation: rise-in 0.4s ease both;
         }
-        .tile .m { font-size: 1.9rem; line-height: 1; }
-        .tile .n { margin-top: 0.5rem; font-weight: 700; font-size: 1.05rem; line-height: 1.15; overflow-wrap: anywhere; }
-        .tile .c { margin-top: 0.35rem; color: var(--lime); font-size: 0.62rem; }
+        .tile .m { font-size: 1.7rem; line-height: 1; }
+        .tile .n { margin-top: 0.55rem; font-family: var(--serif); font-weight: 600; font-size: 1.2rem; line-height: 1.1; overflow-wrap: anywhere; }
+        .tile .c { margin-top: 0.45rem; color: var(--gold); font-size: 0.52rem; }
         .tile.no { opacity: 0.45; }
         .tile.no .c { color: var(--muted); }
-        @keyframes rise { from { opacity: 0; transform: translateY(8px); } }
+        @keyframes rise-in { from { opacity: 0; transform: translateY(8px); } }
         .empty { grid-column: 1 / -1; padding: 3dvh 0; text-align: center; color: var(--muted); }
 
         @media (max-height: 620px) {
             .stepper button { width: 40px; height: 40px; }
-            .btn { padding: 0.8rem 1.1rem; }
+            .btn { padding: 0.9rem 1.2rem; }
         }
     </style>
 </head>
-<body>
+<body class="sub">
 
 <main class="screen">
-    <div class="bar mono">
+    <div class="bar caps">
         <a href="../">← Invitația</a>
         <span id="stepNo">01 / 04</span>
     </div>
@@ -240,14 +251,14 @@
 
     <form class="wizard" id="form" autocomplete="off">
         <section class="step active" data-step="1">
-            <p class="qno mono">Întrebarea 01</p>
+            <p class="qno caps">Întrebarea 01</p>
             <h1 class="q">Cum te <span class="o">cheamă?</span></h1>
             <input class="line-input" type="text" id="name" placeholder="Numele tău" maxlength="60" autocomplete="name" enterkeyhint="next">
-            <p class="hint mono">Enter ↵ ca să mergi mai departe</p>
+            <p class="hint caps">Enter ↵ ca să mergi mai departe</p>
         </section>
 
         <section class="step" data-step="2">
-            <p class="qno mono">Întrebarea 02</p>
+            <p class="qno caps">Întrebarea 02</p>
             <h1 class="q">Vii la <span class="o">petrecere?</span></h1>
             <div class="big-choices">
                 <button type="button" class="bigc" data-r="yes"><span class="e">🎉</span>Vin!</button>
@@ -256,11 +267,11 @@
         </section>
 
         <section class="step" data-step="3">
-            <p class="qno mono">Întrebarea 03</p>
+            <p class="qno caps">Întrebarea 03</p>
             <h1 class="q">Câți <span class="o">veniți?</span></h1>
             <div class="counters">
                 <div class="counter">
-                    <div class="who"><b>🧛 Adulți</b><span class="mono">inclusiv tu</span></div>
+                    <div class="who"><b>🧛 Adulți</b><span class="caps">inclusiv tu</span></div>
                     <div class="stepper" data-key="adults" data-min="1" data-max="15">
                         <button type="button" data-step="-1" aria-label="Scade adulți">−</button>
                         <output id="adultsOut">1</output>
@@ -268,7 +279,7 @@
                     </div>
                 </div>
                 <div class="counter">
-                    <div class="who"><b>🧒 Copii</b><span class="mono">mici monștri</span></div>
+                    <div class="who"><b>🧒 Copii</b><span class="caps">mici monștri</span></div>
                     <div class="stepper" data-key="kids" data-min="0" data-max="15">
                         <button type="button" data-step="-1" aria-label="Scade copii">−</button>
                         <output id="kidsOut">0</output>
@@ -276,48 +287,49 @@
                     </div>
                 </div>
             </div>
-            <p class="sum mono" id="sum"></p>
+            <p class="sum" id="sum"></p>
         </section>
 
         <section class="step" data-step="4">
-            <p class="qno mono" id="q4no">Întrebarea 04</p>
+            <p class="qno caps" id="q4no">Întrebarea 04</p>
             <h1 class="q">Un mesaj pentru <span class="o">Briana?</span></h1>
             <textarea class="line-input" id="msg" placeholder="Opțional…" maxlength="300"></textarea>
         </section>
 
         <section class="step done" data-step="done">
-            <p class="qno mono" id="doneNo">Gata!</p>
+            <p class="qno caps" id="doneNo">Gata!</p>
             <h1 class="q" id="doneTitle">Ne vedem <span class="o">pe 31!</span></h1>
             <p class="txt" id="doneText"></p>
             <button type="button" class="btn btn-line" id="doneWall">👀 Vezi lista de monștri <span class="arr">→</span></button>
-            <button type="button" class="again mono" id="againBtn">Trimite alt răspuns</button>
+            <button type="button" class="again caps" id="againBtn">Trimite alt răspuns</button>
         </section>
     </form>
 
-    <p class="err mono" id="err"></p>
+    <p class="err caps" id="err"></p>
     <div class="nav solo" id="nav">
         <button type="button" class="btn btn-line back-btn" id="backBtn" aria-label="Înapoi">←</button>
         <button type="button" class="btn" id="nextBtn" disabled>Mai departe <span class="arr">→</span></button>
     </div>
-    <button type="button" class="wall-link mono" id="wallBtn">👀 Lista de monștri <b id="wallCount"></b></button>
+    <button type="button" class="wall-link caps" id="wallBtn">👀 Lista de monștri <b id="wallCount"></b></button>
 </main>
 
 <div class="wall" id="wall" aria-hidden="true">
     <div class="screen">
-        <div class="bar mono"><span>🎃 Ziua Brianei</span><span>31.10.2026</span></div>
+        <div class="bar caps"><span>Ziua Brianei</span><span>31 · 10 · 2026</span></div>
         <div class="wall-head">
-            <h2>Lista de<br><span class="o">monștri</span></h2>
+            <h2>Lista de <span class="o">monștri</span></h2>
             <button type="button" class="close" id="closeWall" aria-label="Închide">×</button>
         </div>
-        <div class="totals">
-            <div><b id="tFam">0</b><span class="mono">înscrieri</span></div>
-            <div><b id="tAd">0</b><span class="mono">adulți</span></div>
-            <div><b id="tKid">0</b><span class="mono">copii</span></div>
+        <div class="totals frame"><i class="c1"></i><i class="c2"></i>
+            <div><b id="tFam">0</b><span class="caps">înscrieri</span></div>
+            <div><b id="tAd">0</b><span class="caps">adulți</span></div>
+            <div><b id="tKid">0</b><span class="caps">copii</span></div>
         </div>
-        <div class="tiles" id="tiles"><p class="empty mono">Se încarcă… 🦇</p></div>
+        <div class="tiles" id="tiles"><p class="empty caps">Se încarcă… 🦇</p></div>
     </div>
 </div>
 
+<script src="../atmosphere.js"></script>
 <script src="../db.js"></script>
 <script>
     const $ = id => document.getElementById(id);
@@ -346,7 +358,7 @@
         $('nav').classList.toggle('hidden', done);
         $('nav').classList.toggle('solo', step === 1);
         $('wallBtn').style.display = done ? 'none' : '';
-        $('nextBtn').innerHTML = step === 4 ? 'Trimite 🎃' : 'Mai departe <span class="arr">→</span>';
+        $('nextBtn').innerHTML = step === 4 ? 'Trimite <span class="arr">→</span>' : 'Mai departe <span class="arr">→</span>';
         validate();
 
         if (step === 1) setTimeout(() => nm.focus({ preventScroll: true }), 320);
@@ -438,7 +450,7 @@
             $('err').textContent = 'Nu s-a putut trimite. Mai apasă o dată.';
             $('err').classList.add('show');
             btn.disabled = false;
-            btn.textContent = 'Trimite 🎃';
+            btn.textContent = 'Trimite';
             return;
         }
 
@@ -495,7 +507,7 @@
             renderWall();
         } catch (ex) {
             console.error(ex);
-            $('tiles').innerHTML = '<p class="empty mono">Lista nu s-a putut încărca 👻</p>';
+            $('tiles').innerHTML = '<p class="empty caps">Lista nu s-a putut încărca 👻</p>';
         }
     }
 
@@ -508,7 +520,7 @@
         $('wallCount').textContent = t.adults + t.kids ? `(${t.adults + t.kids})` : '';
 
         if (!guests.length) {
-            $('tiles').innerHTML = '<p class="empty mono">Fii primul monstru de pe listă 🦇</p>';
+            $('tiles').innerHTML = '<p class="empty caps">Fii primul monstru de pe listă 🦇</p>';
             return;
         }
         const sorted = [...guests.filter(g => g.response === 'yes'), ...guests.filter(g => g.response !== 'yes')];
@@ -517,7 +529,7 @@
             return `<div class="tile ${yes ? '' : 'no'}" style="animation-delay:${Math.min(i, 20) * 30}ms">
                 <div class="m">${yes ? monsterFor(g.name) : '💤'}</div>
                 <div class="n">${esc(g.name)}</div>
-                <div class="c mono">${yes ? partyLabel(g) : 'nu poate'}</div>
+                <div class="c caps">${yes ? partyLabel(g) : 'nu poate'}</div>
             </div>`;
         }).join('');
     }
