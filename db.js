@@ -30,7 +30,7 @@ async function loadGuests() {
 // Citește ultima versiune, aplică `change(list)` și salvează.
 // Dacă între timp a scris altcineva (409/422), reîncearcă.
 async function updateGuests(change, message) {
-    for (let attempt = 0; attempt < 4; attempt++) {
+    for (let attempt = 0; attempt < 8; attempt++) {
         const { data, sha } = await loadGuests();
         change(data);
         const body = { message, content: encode(data) };
@@ -44,7 +44,8 @@ async function updateGuests(change, message) {
         if (resp.status !== 409 && resp.status !== 422) {
             throw new Error('Eroare la salvare (' + resp.status + ')');
         }
-        await new Promise(r => setTimeout(r, 400 + Math.random() * 600));
+        // Pauză aleatorie, tot mai lungă, ca să nu se ciocnească din nou
+        await new Promise(r => setTimeout(r, 300 + Math.random() * 700 * (attempt + 1)));
     }
     throw new Error('Serverul e ocupat, încearcă din nou.');
 }
