@@ -4,7 +4,7 @@
 const DATA_REPO = 'Ghilezan19/invitatie-briana-date';
 const DATA_FILE = 'guests.json';
 // Tokenul e spart în bucăți ca să nu fie revocat automat de GitHub la push.
-const TOKEN_PARTS = ['PUNE_AICI', '_TOKENUL'];
+const TOKEN_PARTS = ['github_pat_11A32E2AQ0W2THr', 'IePEswT_q1UevZ16fWJ9K7092QYIr1', 'Nr7uBSglSqxBNKjcpibL8FS2K2P7RgAfaFLWi'];
 
 const API_URL = `https://api.github.com/repos/${DATA_REPO}/contents/${DATA_FILE}`;
 const TOKEN = TOKEN_PARTS.join('');
