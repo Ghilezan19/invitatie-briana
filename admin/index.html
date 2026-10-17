@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Admin — Ziua Brianei</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { background: #1a1a2e; color: #fff; padding: 2rem 1rem; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { margin-bottom: 1.5rem; color: #ff9900; text-align: center; }
+
+        #loginBlock { text-align: center; margin-top: 5rem; }
+        #loginBlock input { padding: 0.5rem; font-size: 1rem; border-radius: 4px; border: 1px solid #ff9900; background: #2a2a4e; color: white; }
+        #loginBlock button { padding: 0.5rem 1rem; font-size: 1rem; border-radius: 4px; border: none; background: #ff9900; color: #1a1a2e; cursor: pointer; font-weight: bold; }
+        #loginErr { color: #ef4444; margin-top: 1rem; display: none; }
+
+        #adminBlock { display: none; }
+
+        .stats { display: flex; gap: 0.8rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .stat { flex: 1; min-width: 120px; background: rgba(255,153,0,0.08); border: 1px solid rgba(255,153,0,0.25); border-radius: 8px; padding: 0.8rem; text-align: center; }
+        .stat b { display: block; font-size: 1.8rem; color: #ff9900; }
+        .stat span { font-size: 0.8rem; opacity: 0.7; }
+
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden; }
+        th, td { padding: 0.8rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); vertical-align: middle; }
+        th { background: rgba(0,0,0,0.3); color: #ff9900; white-space: nowrap; }
+        td.num { text-align: center; }
+
+        .btn { padding: 0.4rem 0.8rem; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: bold; margin: 0.1rem; }
+        .btn-edit { background: #3b82f6; color: white; }
+        .btn-del { background: #ef4444; color: white; }
+        .btn-save { background: #10b981; color: white; }
+        .btn-cancel { background: #6b7280; color: white; }
+
+        .edit-mode { padding: 0.3rem; width: 100%; background: #2a2a4e; border: 1px solid #ff9900; color: white; border-radius: 4px; }
+        input.edit-mode[type=number] { width: 4rem; }
+
+        #statusMsg { text-align: center; margin-bottom: 1rem; font-weight: bold; min-height: 1.2em; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🎃 Admin Răspunsuri</h1>
+
+    <form id="loginBlock">
+        <input type="password" id="passInput" placeholder="Parolă" autofocus>
+        <button type="submit">Intră</button>
+        <p id="loginErr">Parolă incorectă!</p>
+    </form>
+
+    <div id="adminBlock">
+        <div class="stats">
+            <div class="stat"><b id="sFam">0</b><span>Înscrieri „Vin”</span></div>
+            <div class="stat"><b id="sAd">0</b><span>Adulți</span></div>
+            <div class="stat"><b id="sKid">0</b><span>Copii</span></div>
+            <div class="stat"><b id="sTot">0</b><span>Total persoane</span></div>
+        </div>
+        <div id="statusMsg"></div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nr.</th>
+                        <th>Nume</th>
+                        <th>Răspuns</th>
+                        <th>Adulți</th>
+                        <th>Copii</th>
+                        <th>Mesaj</th>
+                        <th>Acțiuni</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="../db.js"></script>
+<script>
+    let currentData = [];
+    let editingIndex = -1;
+
+    document.getElementById('loginBlock').addEventListener('submit', e => {
+        e.preventDefault();
+        if (document.getElementById('passInput').value === 'briana') {
+            document.getElementById('loginBlock').style.display = 'none';
+            document.getElementById('adminBlock').style.display = 'block';
+            loadData();
+        } else {
+            document.getElementById('loginErr').style.display = 'block';
+        }
+    });
+
+    function status(text, color) {
+        const m = document.getElementById('statusMsg');
+        m.textContent = text;
+        m.style.color = color;
+    }
+
+    async function loadData() {
+        status('Se încarcă...', '#ff9900');
+        try {
+            currentData = (await loadGuests()).data;
+            status('', '');
+            renderTable();
+        } catch (e) {
+            console.error(e);
+            status('Eroare la încărcare!', '#ef4444');
+        }
+    }
+
+    function renderStats() {
+        const t = totals(currentData);
+        document.getElementById('sFam').textContent = t.families;
+        document.getElementById('sAd').textContent = t.adults;
+        document.getElementById('sKid').textContent = t.kids;
+        document.getElementById('sTot').textContent = t.adults + t.kids;
+    }
+
+    function renderTable() {
+        renderStats();
+        const tbody = document.getElementById('tableBody');
+        if (!currentData.length) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Niciun răspuns încă.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = currentData.map((item, i) => {
+            if (i === editingIndex) {
+                return `<tr>
+                    <td>${i + 1}</td>
+                    <td><input type="text" id="editName" class="edit-mode" value="${esc(item.name)}"></td>
+                    <td>
+                        <select id="editResp" class="edit-mode">
+                            <option value="yes" ${item.response === 'yes' ? 'selected' : ''}>Vin!</option>
+                            <option value="no" ${item.response !== 'yes' ? 'selected' : ''}>Nu pot</option>
+                        </select>
+                    </td>
+                    <td class="num"><input type="number" min="0" max="15" id="editAdults" class="edit-mode" value="${item.adults || 0}"></td>
+                    <td class="num"><input type="number" min="0" max="15" id="editKids" class="edit-mode" value="${item.kids || 0}"></td>
+                    <td><input type="text" id="editMsg" class="edit-mode" value="${esc(item.message || '')}"></td>
+                    <td>
+                        <button class="btn btn-save" onclick="saveEdit(${i})">Salvează</button>
+                        <button class="btn btn-cancel" onclick="cancelEdit()">Anulează</button>
+                    </td>
+                </tr>`;
+            }
+            const yes = item.response === 'yes';
+            return `<tr>
+                <td>${i + 1}</td>
+                <td>${esc(item.name)}</td>
+                <td>${yes ? 'Vin! 🎉' : 'Nu pot 😢'}</td>
+                <td class="num">${yes ? item.adults || 0 : '—'}</td>
+                <td class="num">${yes ? item.kids || 0 : '—'}</td>
+                <td>${esc(item.message || '')}</td>
+                <td>
+                    <button class="btn btn-edit" onclick="startEdit(${i})">Editează</button>
+                    <button class="btn btn-del" onclick="deleteItem(${i})">Șterge</button>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    function startEdit(i) { editingIndex = i; renderTable(); }
+    function cancelEdit() { editingIndex = -1; renderTable(); }
+
+    // Identifică intrarea după nume + oră, ca să nu modificăm alt rând
+    // dacă între timp s-a mai înscris cineva.
+    const sameEntry = (a, b) => a.name === b.name && a.time === b.time;
+
+    async function saveEdit(i) {
+        const name = document.getElementById('editName').value.trim();
+        if (!name) return alert('Numele nu poate fi gol!');
+        const response = document.getElementById('editResp').value;
+        const clamp = v => Math.max(0, Math.min(15, parseInt(v, 10) || 0));
+        const patch = {
+            name,
+            response,
+            adults: response === 'yes' ? clamp(document.getElementById('editAdults').value) : 0,
+            kids: response === 'yes' ? clamp(document.getElementById('editKids').value) : 0,
+            message: document.getElementById('editMsg').value.trim(),
+        };
+        const original = currentData[i];
+        editingIndex = -1;
+        await save(list => {
+            const idx = list.findIndex(g => sameEntry(g, original));
+            if (idx >= 0) Object.assign(list[idx], patch);
+        }, 'Admin: editare ' + name);
+    }
+
+    async function deleteItem(i) {
+        const original = currentData[i];
+        if (!confirm(`Ștergi răspunsul lui ${original.name}?`)) return;
+        await save(list => {
+            const idx = list.findIndex(g => sameEntry(g, original));
+            if (idx >= 0) list.splice(idx, 1);
+        }, 'Admin: ștergere ' + original.name);
+    }
+
+    async function save(change, message) {
+        status('Se salvează...', '#ff9900');
+        try {
+            currentData = await updateGuests(change, message);
+            renderTable();
+            status('✅ Modificările au fost salvate!', '#10b981');
+            setTimeout(() => status('', ''), 3000);
+        } catch (err) {
+            console.error(err);
+            status('❌ Eroare la salvare!', '#ef4444');
+            loadData();
+        }
+    }
+</script>
+
+</body>
+</html>

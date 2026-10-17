@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎃 Confirmă Prezența — Ziua Brianei</title>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0c0816;
+            color: #ede6f5;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        .bg-img {
+            position: fixed; inset: 0;
+            background: url('../halloween_bg.jpg') center/cover no-repeat;
+            filter: brightness(0.18) saturate(1.2);
+        }
+
+        .bg-fade {
+            position: fixed; inset: 0;
+            background: linear-gradient(180deg, rgba(12,8,22,0.3), rgba(12,8,22,0.85) 60%, rgba(12,8,22,0.97));
+        }
+
+        .particles { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+        .p { position: absolute; opacity: 0.45; animation: drift ease-in-out infinite; }
+        @keyframes drift {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(15px, -20px) rotate(5deg); }
+            50% { transform: translate(-10px, -35px) rotate(-3deg); }
+            75% { transform: translate(20px, -15px) rotate(7deg); }
+        }
+
+        .page {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(30, 20, 50, 0.7);
+            border: 1px solid rgba(255,140,0,0.12);
+            border-radius: 24px;
+            padding: 1.5rem;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.8rem;
+            color: rgba(237,230,245,0.4);
+            text-decoration: none;
+            margin-bottom: 1.2rem;
+            transition: color 0.2s;
+        }
+        .back:hover { color: #ffb347; }
+
+        .rsvp-title {
+            font-family: 'Creepster', cursive;
+            font-size: 1.8rem;
+            color: #ff8c00;
+            text-align: center;
+            margin-bottom: 1.2rem;
+        }
+
+        .field { margin-bottom: 0.9rem; }
+
+        .field > label, .field .lbl {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,179,71,0.6);
+            margin-bottom: 0.4rem;
+        }
+
+        .field input, .field textarea {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,140,0,0.12);
+            border-radius: 10px;
+            color: #ede6f5;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .field input:focus, .field textarea:focus { border-color: rgba(255,140,0,0.4); }
+        .field textarea { resize: none; height: 48px; }
+        .field input::placeholder, .field textarea::placeholder { color: rgba(237,230,245,0.2); }
+
+        .responses { display: flex; gap: 0.6rem; }
+
+        .resp {
+            flex: 1;
+            padding: 0.6rem 0.4rem;
+            border: 1.5px solid rgba(255,255,255,0.07);
+            border-radius: 12px;
+            background: transparent;
+            color: #ede6f5;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .resp:hover { background: rgba(255,255,255,0.04); }
+        .resp[data-r="yes"].on { border-color: #4ade80; background: rgba(74,222,128,0.1); }
+        .resp[data-r="no"].on { border-color: #f87171; background: rgba(248,113,113,0.1); }
+
+        /* Câte persoane */
+        .party { display: none; }
+        .party.show { display: block; animation: fadeIn 0.25s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+        .counter {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.55rem 0.6rem 0.55rem 0.9rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,140,0,0.12);
+            border-radius: 12px;
+        }
+        .counter + .counter { margin-top: 0.5rem; }
+
+        .counter .who { display: flex; align-items: center; gap: 0.6rem; }
+        .counter .who .ic { font-size: 1.4rem; }
+        .counter .who b { display: block; font-size: 0.92rem; font-weight: 600; }
+        .counter .who small { display: block; font-size: 0.7rem; color: rgba(237,230,245,0.4); margin-top: 1px; }
+
+        .stepper { display: flex; align-items: center; gap: 0.5rem; }
+        .stepper button {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255,140,0,0.35);
+            background: rgba(255,140,0,0.08);
+            color: #ffb347;
+            font-size: 1.3rem;
+            font-weight: 600;
+            line-height: 1;
+            cursor: pointer;
+            transition: all 0.15s;
+            touch-action: manipulation;
+        }
+        .stepper button:hover:not(:disabled) { background: rgba(255,140,0,0.2); }
+        .stepper button:active:not(:disabled) { transform: scale(0.92); }
+        .stepper button:disabled { opacity: 0.25; cursor: default; }
+        .stepper output {
+            min-width: 1.8rem;
+            text-align: center;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #ffd700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .party-sum {
+            margin-top: 0.5rem;
+            font-size: 0.78rem;
+            text-align: center;
+            color: rgba(237,230,245,0.55);
+        }
+        .party-sum strong { color: #ffb347; }
+
+        .send {
+            width: 100%;
+            margin-top: 0.8rem;
+            padding: 0.85rem;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ff8c00, #e8720c);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 20px rgba(255,140,0,0.25);
+        }
+        .send:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(255,140,0,0.4); }
+        .send:disabled { opacity: 0.35; cursor: default; transform: none; box-shadow: none; }
+
+        .err { display: none; margin-top: 0.6rem; font-size: 0.8rem; color: #f87171; text-align: center; }
+        .err.show { display: block; }
+
+        /* Done */
+        .done { display: none; text-align: center; padding: 1.5rem 0; }
+        .done.show { display: block; }
+        .done .di { font-size: 3rem; margin-bottom: 0.5rem; animation: pop 0.4s cubic-bezier(0.175,0.885,0.32,1.275); }
+        .done h3 { font-family: 'Creepster', cursive; color: #4ade80; font-size: 1.5rem; margin-bottom: 0.3rem; }
+        .done p { font-size: 0.85rem; color: rgba(237,230,245,0.55); margin-bottom: 1.2rem; }
+        .done a { color: #ffb347; font-size: 0.85rem; text-decoration: none; }
+        .done a:hover { text-decoration: underline; }
+        form.off { display: none; }
+        @keyframes pop { 0% { transform: scale(0); } 80% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
+        .toggle-wrap {
+            text-align: center;
+            margin-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 1.2rem;
+        }
+        .toggle-btn {
+            background: none;
+            border: 1px solid rgba(255,140,0,0.3);
+            color: #ffb347;
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .toggle-btn:hover { background: rgba(255,140,0,0.08); }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-content {
+            background: rgba(30, 20, 50, 0.95);
+            border: 1px solid rgba(255,140,0,0.3);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 420px;
+            padding: 1.8rem 1.5rem 1.5rem;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .close-btn {
+            position: absolute;
+            top: 12px; right: 18px;
+            background: none; border: none;
+            color: #ffb347; font-size: 1.6rem;
+            cursor: pointer;
+        }
+
+        .gt {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,179,71,0.5);
+            margin-bottom: 0.7rem;
+            text-align: center;
+        }
+
+        .stats { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .stat {
+            flex: 1;
+            text-align: center;
+            padding: 0.55rem 0.3rem;
+            background: rgba(255,140,0,0.06);
+            border: 1px solid rgba(255,140,0,0.15);
+            border-radius: 12px;
+        }
+        .stat b { display: block; font-size: 1.3rem; color: #ffd700; font-variant-numeric: tabular-nums; }
+        .stat span { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(237,230,245,0.5); }
+
+        .gi {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6rem;
+            padding: 0.5rem 0;
+            font-size: 0.85rem;
+        }
+        .gi + .gi { border-top: 1px solid rgba(255,255,255,0.04); }
+        .gi .nr { color: rgba(255,179,71,0.7); font-weight: 700; margin-right: 0.3rem; }
+
+        .gb {
+            flex-shrink: 0;
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 0.2rem 0.55rem;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+        .gb.yes { background: rgba(74,222,128,0.12); color: #4ade80; }
+        .gb.no { background: rgba(248,113,113,0.12); color: #f87171; }
+
+        .ge { text-align: center; font-size: 0.8rem; color: rgba(237,230,245,0.3); padding: 0.4rem 0; }
+
+        @media (max-height: 620px) {
+            .card { padding: 1.2rem; }
+            .rsvp-title { font-size: 1.4rem; margin-bottom: 0.8rem; }
+            .field { margin-bottom: 0.6rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-img"></div>
+<div class="bg-fade"></div>
+<div class="particles" id="particles"></div>
+
+<div class="page">
+    <div class="card">
+        <a href="../" class="back">← Înapoi la invitație</a>
+
+        <h2 class="rsvp-title">🎃 Confirma Prezenta</h2>
+
+        <form id="form">
+            <div class="field">
+                <label for="name">Numele tău</label>
+                <input type="text" id="name" placeholder="Cum te cheamă?" autocomplete="name" required>
+            </div>
+
+            <div class="field">
+                <span class="lbl">Poți veni?</span>
+                <div class="responses">
+                    <button type="button" class="resp" data-r="yes">Vin!</button>
+                    <button type="button" class="resp" data-r="no">Nu pot</button>
+                </div>
+            </div>
+
+            <div class="field party" id="party">
+                <span class="lbl">Câte persoane veniți?</span>
+
+                <div class="counter">
+                    <div class="who">
+                        <span class="ic">🧛</span>
+                        <div><b>Adulți</b><small>inclusiv tu</small></div>
+                    </div>
+                    <div class="stepper" data-key="adults" data-min="0" data-max="15">
+                        <button type="button" data-step="-1" aria-label="Scade adulți">−</button>
+                        <output id="adultsOut">1</output>
+                        <button type="button" data-step="1" aria-label="Adaugă adulți">+</button>
+                    </div>
+                </div>
+
+                <div class="counter">
+                    <div class="who">
+                        <span class="ic">🧒</span>
+                        <div><b>Copii</b></div>
+                    </div>
+                    <div class="stepper" data-key="kids" data-min="0" data-max="15">
+                        <button type="button" data-step="-1" aria-label="Scade copii">−</button>
+                        <output id="kidsOut">0</output>
+                        <button type="button" data-step="1" aria-label="Adaugă copii">+</button>
+                    </div>
+                </div>
+
+                <p class="party-sum" id="partySum"></p>
+            </div>
+
+            <div class="field">
+                <label for="msg">Mesaj (opțional)</label>
+                <textarea id="msg" placeholder="Ceva de adăugat?"></textarea>
+            </div>
+
+            <button type="submit" class="send" id="sendBtn" disabled>Trimite</button>
+            <p class="err" id="err"></p>
+        </form>
+
+        <div class="done" id="done">
+            <div class="di" id="doneIcon">🎉</div>
+            <h3 id="doneTitle">Mersi!</h3>
+            <p id="doneText">Răspunsul tău a fost salvat.</p>
+            <a href="../">← Înapoi la invitație</a>
+        </div>
+
+        <div class="toggle-wrap">
+            <button type="button" class="toggle-btn" id="toggleBtn">👀 Vezi cine mai vine</button>
+        </div>
+    </div>
+</div>
+
+<div id="guestsOverlay" class="modal-overlay">
+    <div class="modal-content">
+        <button type="button" id="closeModalBtn" class="close-btn" aria-label="Închide">&times;</button>
+        <div class="gt">Cine vine</div>
+        <div class="stats" id="stats" hidden>
+            <div class="stat"><b id="sFam">0</b><span>Înscrieri</span></div>
+            <div class="stat"><b id="sAd">0</b><span>Adulți</span></div>
+            <div class="stat"><b id="sKid">0</b><span>Copii</span></div>
+        </div>
+        <div id="gList"><div class="ge">Se încarcă… 🦇</div></div>
+    </div>
+</div>
+
+<script src="../db.js"></script>
+<script>
+    // Particles
+    const box = document.getElementById('particles');
+    const emo = ['🎃','👻','🦇','🍂','✨','🌙'];
+    for (let i = 0; i < 18; i++) {
+        const s = document.createElement('span');
+        s.className = 'p';
+        s.textContent = emo[Math.floor(Math.random() * emo.length)];
+        s.style.left = Math.random() * 100 + '%';
+        s.style.top = Math.random() * 100 + '%';
+        s.style.fontSize = (0.7 + Math.random()) + 'rem';
+        s.style.animationDuration = (4 + Math.random() * 6) + 's';
+        s.style.animationDelay = Math.random() * -6 + 's';
+        box.appendChild(s);
+    }
+
+    // RSVP
+    let pick = null;
+    const count = { adults: 1, kids: 0 };
+    const nm = document.getElementById('name');
+    const sendBtn = document.getElementById('sendBtn');
+    const party = document.getElementById('party');
+
+    document.querySelectorAll('.resp').forEach(b => {
+        b.addEventListener('click', () => {
+            document.querySelectorAll('.resp').forEach(x => x.classList.remove('on'));
+            b.classList.add('on');
+            pick = b.dataset.r;
+            party.classList.toggle('show', pick === 'yes');
+            chk();
+        });
+    });
+
+    document.querySelectorAll('.stepper').forEach(st => {
+        const key = st.dataset.key;
+        const min = +st.dataset.min, max = +st.dataset.max;
+        st.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                count[key] = Math.min(max, Math.max(min, count[key] + +btn.dataset.step));
+                renderCounts();
+                chk();
+            });
+        });
+    });
+
+    function renderCounts() {
+        document.getElementById('adultsOut').textContent = count.adults;
+        document.getElementById('kidsOut').textContent = count.kids;
+        document.querySelectorAll('.stepper').forEach(st => {
+            const v = count[st.dataset.key];
+            st.querySelector('[data-step="-1"]').disabled = v <= +st.dataset.min;
+            st.querySelector('[data-step="1"]').disabled = v >= +st.dataset.max;
+        });
+        const total = count.adults + count.kids;
+        const name = nm.value.trim() || 'Tu';
+        document.getElementById('partySum').innerHTML = total
+            ? `<strong>${esc(name)}</strong>: ${partyLabel(count)} → <strong>${plural(total, 'persoană', 'persoane')}</strong> în total`
+            : 'Alege cel puțin o persoană';
+    }
+
+    nm.addEventListener('input', () => { renderCounts(); chk(); });
+
+    function chk() {
+        const okParty = pick === 'no' || (pick === 'yes' && count.adults + count.kids > 0);
+        sendBtn.disabled = !(nm.value.trim() && okParty);
+    }
+
+    document.getElementById('form').addEventListener('submit', async e => {
+        e.preventDefault();
+        if (sendBtn.disabled) return;
+
+        const err = document.getElementById('err');
+        err.classList.remove('show');
+        sendBtn.disabled = true;
+        sendBtn.textContent = 'Se trimite...';
+
+        const entry = {
+            name: nm.value.trim(),
+            response: pick,
+            adults: pick === 'yes' ? count.adults : 0,
+            kids: pick === 'yes' ? count.kids : 0,
+            message: document.getElementById('msg').value.trim(),
+            time: new Date().toISOString(),
+        };
+
+        try {
+            guests = await updateGuests(list => list.push(entry), 'RSVP: ' + entry.name);
+        } catch (ex) {
+            console.error(ex);
+            err.textContent = 'Nu s-a putut trimite. Mai apasă o dată pe Trimite.';
+            err.classList.add('show');
+            sendBtn.disabled = false;
+            sendBtn.textContent = 'Trimite';
+            return;
+        }
+
+        e.target.classList.add('off');
+        document.getElementById('done').classList.add('show');
+        const yes = pick === 'yes';
+        document.getElementById('doneIcon').textContent = yes ? '🎉' : '😢';
+        document.getElementById('doneTitle').textContent = yes ? 'Ne vedem acolo!' : 'Păcat...';
+        document.getElementById('doneTitle').style.color = yes ? '#4ade80' : '#f87171';
+        document.getElementById('doneText').textContent = yes
+            ? `Te-am trecut cu ${partyLabel(entry)}. Pregătiți costumele! 🧡`
+            : 'Poate altă dată! 🧡';
+        renderList();
+    });
+
+    // Lista
+    let guests = null;
+
+    async function loadData() {
+        try {
+            guests = (await loadGuests()).data;
+        } catch (ex) {
+            console.error(ex);
+            document.getElementById('gList').innerHTML = '<div class="ge">Lista nu s-a putut încărca 👻</div>';
+            return;
+        }
+        renderList();
+    }
+
+    function renderList() {
+        const list = document.getElementById('gList');
+        if (!guests) return;
+        if (!guests.length) {
+            document.getElementById('stats').hidden = true;
+            list.innerHTML = '<div class="ge">Fii primul care răspunde 🦇</div>';
+            return;
+        }
+        const t = totals(guests);
+        document.getElementById('stats').hidden = false;
+        document.getElementById('sFam').textContent = t.families;
+        document.getElementById('sAd').textContent = t.adults;
+        document.getElementById('sKid').textContent = t.kids;
+
+        // Cei care vin primii, apoi cei care nu pot
+        const sorted = [...guests.filter(g => g.response === 'yes'), ...guests.filter(g => g.response !== 'yes')];
+        list.innerHTML = sorted.map((g, i) => `
+            <div class="gi">
+                <span><span class="nr">${i + 1}.</span>${esc(g.name)}</span>
+                <span class="gb ${g.response === 'yes' ? 'yes' : 'no'}">${g.response === 'yes' ? partyLabel(g) : 'nu poate 😢'}</span>
+            </div>`).join('');
+    }
+
+    const overlay = document.getElementById('guestsOverlay');
+    document.getElementById('toggleBtn').addEventListener('click', () => { overlay.classList.add('show'); loadData(); });
+    document.getElementById('closeModalBtn').addEventListener('click', () => overlay.classList.remove('show'));
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('show'); });
+
+    renderCounts();
+</script>
+</body>
+</html>
