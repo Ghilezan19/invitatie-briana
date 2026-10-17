@@ -139,7 +139,7 @@
                             <option value="no" ${item.response !== 'yes' ? 'selected' : ''}>Nu pot</option>
                         </select>
                     </td>
-                    <td class="num"><input type="number" min="0" max="15" id="editAdults" class="edit-mode" value="${item.adults || 0}"></td>
+                    <td class="num"><input type="number" min="1" max="15" id="editAdults" class="edit-mode" value="${item.adults || 0}"></td>
                     <td class="num"><input type="number" min="0" max="15" id="editKids" class="edit-mode" value="${item.kids || 0}"></td>
                     <td><input type="text" id="editMsg" class="edit-mode" value="${esc(item.message || '')}"></td>
                     <td>
@@ -179,7 +179,7 @@
         const patch = {
             name,
             response,
-            adults: response === 'yes' ? clamp(document.getElementById('editAdults').value) : 0,
+            adults: response === 'yes' ? Math.max(1, clamp(document.getElementById('editAdults').value)) : 0,
             kids: response === 'yes' ? clamp(document.getElementById('editKids').value) : 0,
             message: document.getElementById('editMsg').value.trim(),
         };
