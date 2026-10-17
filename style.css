@@ -1,0 +1,164 @@
+:root {
+    color-scheme: light;
+    --paper: #fff4e4;
+    --paper-2: #ffe9cc;
+    --ink: #24162f;
+    --ink-soft: #6b5a78;
+    --orange: #ff7a1a;
+    --orange-2: #ffa24c;
+    --purple: #7b3fe4;
+    --purple-soft: #efe5ff;
+    --lime: #c4ec6a;
+    --pink: #ffb3c8;
+    --white: #fffdf9;
+    --line: 2.5px solid var(--ink);
+    --shadow: 5px 5px 0 var(--ink);
+    --shadow-sm: 3px 3px 0 var(--ink);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Fredoka', system-ui, sans-serif;
+    color: var(--ink);
+    background-color: var(--paper);
+    background-image:
+        radial-gradient(circle at 15% 10%, rgba(255,162,76,0.35), transparent 40%),
+        radial-gradient(circle at 90% 85%, rgba(123,63,228,0.18), transparent 45%),
+        radial-gradient(rgba(36,22,47,0.09) 1.4px, transparent 1.6px);
+    background-size: auto, auto, 22px 22px;
+    background-attachment: fixed;
+    min-height: 100vh;
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Ghirlanda de stegulețe */
+.bunting {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 46px;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 6px;
+    pointer-events: none;
+    z-index: 2;
+}
+.bunting::before {
+    content: '';
+    position: absolute;
+    left: -5%; right: -5%; top: 6px;
+    height: 30px;
+    border-bottom: 2px solid var(--ink);
+    border-radius: 0 0 50% 50%;
+}
+.bunting span {
+    position: relative;
+    width: 30px; height: 34px;
+    margin-top: 10px;
+    background: var(--orange);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform-origin: top center;
+    animation: flap 3s ease-in-out infinite;
+}
+.bunting span:nth-child(3n+2) { background: var(--ink); }
+.bunting span:nth-child(3n+3) { background: var(--purple); }
+.bunting span:nth-child(odd) { animation-delay: -1.5s; }
+@keyframes flap { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+
+/* Decor plutitor */
+.floaters { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.floaters span {
+    position: absolute;
+    font-size: 1.6rem;
+    opacity: 0.55;
+    animation: bob 6s ease-in-out infinite;
+}
+@keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(-6deg); }
+    50% { transform: translateY(-14px) rotate(6deg); }
+}
+
+.wrap {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+    padding: 64px 18px 32px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Titluri */
+.display {
+    font-family: 'Rubik Wet Paint', 'Fredoka', cursive;
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: 0.5px;
+}
+
+.kicker {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    color: var(--ink-soft);
+}
+
+/* Butoane */
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.95rem 1rem;
+    border: var(--line);
+    border-radius: 16px;
+    background: var(--orange);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: transform 0.12s, box-shadow 0.12s, background 0.2s;
+    -webkit-tap-highlight-color: transparent;
+}
+.btn:hover { background: var(--orange-2); }
+.btn:active:not(:disabled) { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ink); }
+.btn:disabled { opacity: 0.45; cursor: default; box-shadow: var(--shadow-sm); }
+.btn .arrow { transition: transform 0.2s; }
+.btn:hover .arrow { transform: translateX(4px); }
+
+.btn-ghost {
+    background: var(--white);
+    font-size: 0.95rem;
+    padding: 0.7rem 1rem;
+    box-shadow: var(--shadow-sm);
+}
+.btn-ghost:hover { background: var(--purple-soft); }
+
+/* Card */
+.card {
+    background: var(--white);
+    border: var(--line);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+}
+
+/* Fantomița */
+.ghost { animation: float 4s ease-in-out infinite; transform-origin: center bottom; }
+@keyframes float {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-10px) rotate(3deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+}
