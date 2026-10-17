@@ -52,7 +52,16 @@ async function updateGuests(change, message) {
 
 function esc(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; }
 
-function plural(n, one, many) { return n === 1 ? `1 ${one}` : `${n} ${many}`; }
+// Româna cere „de” de la 20 în sus („30 de persoane”), dar nu când
+// ultimele două cifre sunt 01–19 („101 persoane”).
+function plural(n, one, many) {
+    if (n === 1) return `1 ${one}`;
+    const r = n % 100;
+    return n >= 20 && (r === 0 || r >= 20) ? `${n} de ${many}` : `${n} ${many}`;
+}
+
+const MAX_NAME = 60;
+const MAX_MSG = 300;
 
 // "2 adulți · 1 copil"
 function partyLabel(g) {

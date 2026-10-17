@@ -332,7 +332,7 @@
         <form id="form">
             <div class="field">
                 <label for="name">Numele tău</label>
-                <input type="text" id="name" placeholder="Cum te cheamă?" autocomplete="name" required>
+                <input type="text" id="name" placeholder="Cum te cheamă?" autocomplete="name" maxlength="60" required>
             </div>
 
             <div class="field">
@@ -375,7 +375,7 @@
 
             <div class="field">
                 <label for="msg">Mesaj (opțional)</label>
-                <textarea id="msg" placeholder="Ceva de adăugat?"></textarea>
+                <textarea id="msg" placeholder="Ceva de adăugat?" maxlength="300"></textarea>
             </div>
 
             <button type="submit" class="send" id="sendBtn" disabled>Trimite</button>
@@ -486,11 +486,11 @@
         sendBtn.textContent = 'Se trimite...';
 
         const entry = {
-            name: nm.value.trim(),
+            name: nm.value.trim().slice(0, MAX_NAME),
             response: pick,
             adults: pick === 'yes' ? count.adults : 0,
             kids: pick === 'yes' ? count.kids : 0,
-            message: document.getElementById('msg').value.trim(),
+            message: document.getElementById('msg').value.trim().slice(0, MAX_MSG),
             time: new Date().toISOString(),
         };
 

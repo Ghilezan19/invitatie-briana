@@ -132,7 +132,7 @@
             if (i === editingIndex) {
                 return `<tr>
                     <td>${i + 1}</td>
-                    <td><input type="text" id="editName" class="edit-mode" value="${esc(item.name)}"></td>
+                    <td><input type="text" id="editName" class="edit-mode" maxlength="60" value="${esc(item.name)}"></td>
                     <td>
                         <select id="editResp" class="edit-mode">
                             <option value="yes" ${item.response === 'yes' ? 'selected' : ''}>Vin!</option>
@@ -141,7 +141,7 @@
                     </td>
                     <td class="num"><input type="number" min="1" max="15" id="editAdults" class="edit-mode" value="${item.adults || 0}"></td>
                     <td class="num"><input type="number" min="0" max="15" id="editKids" class="edit-mode" value="${item.kids || 0}"></td>
-                    <td><input type="text" id="editMsg" class="edit-mode" value="${esc(item.message || '')}"></td>
+                    <td><input type="text" id="editMsg" class="edit-mode" maxlength="300" value="${esc(item.message || '')}"></td>
                     <td>
                         <button class="btn btn-save" onclick="saveEdit(${i})">Salvează</button>
                         <button class="btn btn-cancel" onclick="cancelEdit()">Anulează</button>
@@ -172,7 +172,7 @@
     const sameEntry = (a, b) => a.name === b.name && a.time === b.time;
 
     async function saveEdit(i) {
-        const name = document.getElementById('editName').value.trim();
+        const name = document.getElementById('editName').value.trim().slice(0, MAX_NAME);
         if (!name) return alert('Numele nu poate fi gol!');
         const response = document.getElementById('editResp').value;
         const clamp = v => Math.max(0, Math.min(15, parseInt(v, 10) || 0));
@@ -181,7 +181,7 @@
             response,
             adults: response === 'yes' ? Math.max(1, clamp(document.getElementById('editAdults').value)) : 0,
             kids: response === 'yes' ? clamp(document.getElementById('editKids').value) : 0,
-            message: document.getElementById('editMsg').value.trim(),
+            message: document.getElementById('editMsg').value.trim().slice(0, MAX_MSG),
         };
         const original = currentData[i];
         editingIndex = -1;
