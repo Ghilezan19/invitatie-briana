@@ -125,8 +125,11 @@
             touch-action: manipulation;
             transition: background 0.15s, border-color 0.15s, transform 0.1s;
         }
-        .stepper button:hover:not(:disabled) { border-color: var(--gold); background: rgba(230, 177, 90, 0.08); }
+        .stepper button:focus { outline: none; }
+        .stepper button:focus-visible { box-shadow: 0 0 0 3px rgba(230, 177, 90, 0.45); }
+        .stepper button[data-step="-1"]:hover:not(:disabled) { border-color: var(--gold); background: rgba(230, 177, 90, 0.08); }
         .stepper button[data-step="1"] { background: var(--gold-grad); color: #1a1006; border-color: transparent; }
+        .stepper button[data-step="1"]:hover:not(:disabled) { filter: brightness(1.08); }
         .stepper button:active:not(:disabled) { transform: scale(0.9); }
         .stepper button:disabled { opacity: 0.25; cursor: default; }
         .stepper output {

@@ -191,6 +191,9 @@ body {
 .frame > .c2 { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
 
 /* ---------- Butoane ---------- */
+button:focus, a:focus { outline: none; }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
 .btn {
     position: relative;
     display: flex;
