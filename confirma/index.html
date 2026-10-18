@@ -281,7 +281,17 @@
             gap: 0.5rem;
             padding-top: 0.9rem;
         }
-        .tile { padding: 0.75rem; border: 1px solid var(--faint); background: rgba(7, 6, 10, 0.5); }
+        .tile { position: relative; padding: 0.75rem; border: 1px solid var(--faint); background: rgba(7, 6, 10, 0.5); }
+        .tile .nr {
+            position: absolute;
+            top: 0.65rem; right: 0.75rem;
+            font-family: var(--display);
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            color: var(--gold);
+        }
+        .tile .nr small { font-size: 0.7em; opacity: 0.7; margin-right: 0.1em; }
         .tile .m { font-size: 1.5rem; line-height: 1; }
         .tile .n { margin-top: 0.45rem; font-family: var(--serif); font-weight: 600; font-size: 1.15rem; line-height: 1.1; overflow-wrap: anywhere; }
         .tile .c { margin-top: 0.4rem; color: var(--gold); font-size: 0.5rem; }
@@ -545,10 +555,14 @@
             $('tiles').innerHTML = '<p class="empty caps">Fii primul monstru de pe listă 🦇</p>';
             return;
         }
-        const sorted = [...guests.filter(g => g.response === 'yes'), ...guests.filter(g => g.response !== 'yes')];
-        $('tiles').innerHTML = sorted.map(g => {
+        // Ordinea înscrierii (lista se salvează cronologic)
+        const ordered = guests
+            .map((g, i) => ({ g, i }))
+            .sort((a, b) => (a.g.time || '').localeCompare(b.g.time || '') || a.i - b.i);
+        $('tiles').innerHTML = ordered.map(({ g }, i) => {
             const yes = g.response === 'yes';
             return `<div class="tile ${yes ? '' : 'no'}">
+                <span class="nr"><small>Nº</small>${i + 1}</span>
                 <div class="m">${yes ? monsterFor(g.name) : '💤'}</div>
                 <div class="n">${esc(g.name)}</div>
                 <div class="c caps">${yes ? partyLabel(g) : 'nu poate'}</div>
