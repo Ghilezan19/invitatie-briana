@@ -346,41 +346,55 @@
     else document.body.classList.add('door-wait');
 
     // Sunete generate în browser: ciocănit în lemn și scârțâit de ușă
-    function doorSounds() {
-        const AC = window.AudioContext || window.webkitAudioContext;
-        if (!AC) return;
-        const ctx = new AC();
-        const out = ctx.createGain();
-        out.gain.value = 0.9;
-        out.connect(ctx.destination);
+    function buildDoorSounds(ctx, t0) {
+        const comp = ctx.createDynamicsCompressor();
+        comp.threshold.value = -18;
+        comp.ratio.value = 4;
+        const master = ctx.createGain();
+        master.gain.value = 0.9;
+        comp.connect(master).connect(ctx.destination);
 
-        function knock(t, strength = 1) {
-            // bufnitura (lemn gros)
-            const o = ctx.createOscillator();
-            const g = ctx.createGain();
-            o.type = 'sine';
-            o.frequency.setValueAtTime(190, t);
-            o.frequency.exponentialRampToValueAtTime(70, t + 0.12);
-            g.gain.setValueAtTime(0.0001, t);
-            g.gain.exponentialRampToValueAtTime(0.9 * strength, t + 0.004);
-            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
-            o.connect(g).connect(out);
-            o.start(t); o.stop(t + 0.2);
+        // ecou scurt, ca într-un hol de castel
+        const delay = ctx.createDelay();
+        delay.delayTime.value = 0.09;
+        const fb = ctx.createGain();
+        fb.gain.value = 0.28;
+        delay.connect(fb).connect(delay);
+        delay.connect(comp);
 
-            // pocnetul (contactul cu ușa)
-            const len = Math.floor(ctx.sampleRate * 0.05);
-            const buf = ctx.createBuffer(1, len, ctx.sampleRate);
-            const d = buf.getChannelData(0);
-            for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 4);
+        const noiseBuf = (sec) => {
+            const len = Math.floor(ctx.sampleRate * sec);
+            const b = ctx.createBuffer(1, len, ctx.sampleRate);
+            const d = b.getChannelData(0);
+            for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+            return b;
+        };
+
+        function knock(t, s = 1) {
+            // corpul lemnului (frecvențe care se aud și pe difuzoare mici)
+            [[420, 180, 0.7], [260, 120, 0.6]].forEach(([f1, f2, a]) => {
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.type = 'triangle';
+                o.frequency.setValueAtTime(f1, t);
+                o.frequency.exponentialRampToValueAtTime(f2, t + 0.08);
+                g.gain.setValueAtTime(0.0001, t);
+                g.gain.exponentialRampToValueAtTime(a * s, t + 0.003);
+                g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
+                o.connect(g); g.connect(comp); g.connect(delay);
+                o.start(t); o.stop(t + 0.18);
+            });
+            // pocnetul încheieturilor pe lemn
             const n = ctx.createBufferSource();
-            n.buffer = buf;
+            n.buffer = noiseBuf(0.07);
             const f = ctx.createBiquadFilter();
             f.type = 'bandpass';
-            f.frequency.value = 900;
-            f.Q.value = 1.2;
+            f.frequency.value = 1600;
+            f.Q.value = 0.9;
             const ng = ctx.createGain();
-            ng.gain.value = 0.6 * strength;
-            n.connect(f).connect(ng).connect(out);
+            ng.gain.value = 1.1 * s;
+            n.connect(f).connect(ng);
+            ng.connect(comp); ng.connect(delay);
             n.start(t);
         }
 
@@ -389,35 +403,43 @@
             const f = ctx.createBiquadFilter();
             const g = ctx.createGain();
             o.type = 'sawtooth';
-            o.frequency.setValueAtTime(95, t);
-            o.frequency.linearRampToValueAtTime(140, t + 0.35);
-            o.frequency.linearRampToValueAtTime(80, t + 0.8);
-            o.frequency.linearRampToValueAtTime(115, t + 1.2);
-            // tremurul lemnului
+            o.frequency.setValueAtTime(180, t);
+            o.frequency.linearRampToValueAtTime(260, t + 0.35);
+            o.frequency.linearRampToValueAtTime(150, t + 0.8);
+            o.frequency.linearRampToValueAtTime(210, t + 1.2);
             const lfo = ctx.createOscillator();
             const lg = ctx.createGain();
-            lfo.frequency.value = 23;
-            lg.gain.value = 18;
+            lfo.type = 'square';
+            lfo.frequency.value = 28;
+            lg.gain.value = 35;
             lfo.connect(lg).connect(o.frequency);
             f.type = 'bandpass';
-            f.frequency.value = 1100;
-            f.Q.value = 6;
+            f.frequency.value = 1400;
+            f.Q.value = 3;
             g.gain.setValueAtTime(0.0001, t);
-            g.gain.exponentialRampToValueAtTime(0.22, t + 0.15);
-            g.gain.setValueAtTime(0.22, t + 0.9);
-            g.gain.exponentialRampToValueAtTime(0.0001, t + 1.35);
-            o.connect(f).connect(g).connect(out);
+            g.gain.exponentialRampToValueAtTime(0.5, t + 0.12);
+            g.gain.setValueAtTime(0.5, t + 0.95);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 1.4);
+            o.connect(f).connect(g).connect(comp);
             o.start(t); lfo.start(t);
-            o.stop(t + 1.4); lfo.stop(t + 1.4);
+            o.stop(t + 1.45); lfo.stop(t + 1.45);
         }
 
-        const now = ctx.currentTime + 0.02;
-        knock(now, 1);
-        knock(now + 0.2, 0.85);
-        knock(now + 0.47, 1);
-        knock(now + 0.67, 0.85);
-        creak(now + 0.95);
-        setTimeout(() => ctx.close(), 3000);
+        knock(t0, 1);
+        knock(t0 + 0.2, 0.8);
+        knock(t0 + 0.47, 1);
+        knock(t0 + 0.67, 0.8);
+        creak(t0 + 0.95);
+    }
+
+    function doorSounds() {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        const ctx = new AC();
+        const go = () => buildDoorSounds(ctx, ctx.currentTime + 0.03);
+        // unele browsere pornesc contextul audio „suspendat”
+        if (ctx.state === 'suspended') ctx.resume().then(go, go); else go();
+        setTimeout(() => ctx.close(), 3500);
     }
 
     function openDoor() {
