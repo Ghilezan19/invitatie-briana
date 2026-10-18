@@ -344,11 +344,11 @@
     }
     tick();
 
-    // Ușa: o dată pe sesiune
+    // Ușa apare de fiecare dată când se deschide linkul;
+    // doar la întoarcerea de pe pagina de confirmare se intră direct.
     const intro = document.getElementById('intro');
-    let seen = false;
-    try { seen = sessionStorage.getItem('briana-door') === '1'; } catch (e) {}
-    if (seen || matchMedia('(prefers-reduced-motion: reduce)').matches) intro.remove();
+    const fromConfirm = document.referrer.includes('/confirma');
+    if (fromConfirm || matchMedia('(prefers-reduced-motion: reduce)').matches) intro.remove();
     else document.body.classList.add('door-wait');
 
     // Sunetul ușii: fișier audio real (merge și în Safari pe Mac/iPhone)
@@ -363,7 +363,6 @@
     }
 
     function openDoor() {
-        try { sessionStorage.setItem('briana-door', '1'); } catch (e) {}
         try { doorSounds(); } catch (e) {}
         intro.classList.add('knock');
         setTimeout(() => {
