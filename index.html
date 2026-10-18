@@ -91,11 +91,12 @@
             color: var(--gold);
             white-space: nowrap;
         }
-        .intro.knock .door { animation: knock 0.45s ease 2; }
+        .intro.knock .door { animation: knock 0.33s ease-out 3; }
         @keyframes knock {
             0%, 100% { transform: none; }
-            25% { transform: translateX(-3px) rotate(-0.6deg); }
-            50% { transform: translateX(3px) rotate(0.6deg); }
+            12% { transform: translateX(-4px) rotate(-0.8deg) scale(0.995); }
+            40% { transform: translateX(3px) rotate(0.5deg); }
+            70% { transform: translateX(-1px); }
         }
         .intro.open .leaf.l { transform: rotateY(-108deg); }
         .intro.open .leaf.r { transform: rotateY(108deg); }
@@ -230,14 +231,14 @@
             <div class="leaf l"><span class="ring"></span></div>
             <div class="leaf r"><span class="ring"></span></div>
         </div>
-        <span class="toc">toc, toc…</span>
+        <span class="toc">toc, toc, toc…</span>
     </div>
     <button type="button" class="btn knock-btn" id="knockBtn">Ciocănește la ușă</button>
 </div>
 
 <audio id="knockAudio" preload="auto" playsinline>
-    <source src="knock.m4a?v=3" type="audio/mp4">
-    <source src="knock.wav?v=3" type="audio/wav">
+    <source src="knock.m4a?v=4" type="audio/mp4">
+    <source src="knock.wav?v=4" type="audio/wav">
 </audio>
 
 <main class="screen">
@@ -370,7 +371,7 @@
             intro.classList.add('open', 'gone');
             setTimeout(() => document.body.classList.remove('door-wait'), 900);
             setTimeout(() => intro.remove(), 1900);
-        }, 950);
+        }, 1000);
     }
     document.getElementById('knockBtn')?.addEventListener('click', openDoor, { once: true });
 </script>
