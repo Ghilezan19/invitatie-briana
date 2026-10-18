@@ -248,3 +248,82 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--gold); outline-
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* ---------- Detalii premium ---------- */
+
+/* Textură de film */
+.atmo .grain {
+    position: absolute;
+    inset: -50%;
+    opacity: 0.09;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grain 0.9s steps(4) infinite;
+}
+@keyframes grain {
+    25% { transform: translate(-3%, 2%); }
+    50% { transform: translate(2%, -3%); }
+    75% { transform: translate(-1%, -2%); }
+}
+
+/* Lumânarea care urmărește degetul / mouse-ul */
+.atmo .spot {
+    position: absolute;
+    left: 0; top: 0;
+    width: 70vmax; height: 70vmax;
+    margin: -35vmax 0 0 -35vmax;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 170, 80, 0.10) 0%, transparent 55%);
+    transform: translate(var(--mx, 50vw), var(--my, 40vh));
+    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    animation: flicker 3.2s ease-in-out infinite;
+}
+@keyframes flicker {
+    0%, 100% { opacity: 1; }
+    20% { opacity: 0.82; }
+    23% { opacity: 0.95; }
+    60% { opacity: 0.88; }
+}
+
+/* Paralaxă pe fundal */
+.atmo .photo { translate: var(--px, 0) var(--py, 0); transition: translate 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+/* Strălucire care trece peste textul auriu */
+.gold-text.shine {
+    background-image: linear-gradient(110deg, #b9792f 0%, #e6b15a 30%, #fff1c9 45%, #e6b15a 60%, #b9792f 100%);
+    background-size: 250% 100%;
+    animation: gold-sweep 7s ease-in-out infinite;
+}
+@keyframes gold-sweep {
+    0%, 100% { background-position: 100% 0; }
+    50% { background-position: 0% 0; }
+}
+
+/* Rama dublă */
+.frame { outline: 1px solid rgba(230, 177, 90, 0.12); outline-offset: -6px; }
+
+/* Intrare coregrafiată */
+.rv { opacity: 0; transform: translateY(14px); filter: blur(6px); animation: reveal 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; animation-delay: var(--d, 0s); }
+@keyframes reveal { to { opacity: 1; transform: none; filter: blur(0); } }
+.gold-text.shine.rv {
+    animation: reveal 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) var(--d, 0s) forwards, gold-sweep 7s ease-in-out infinite;
+}
+
+.orn.draw::before, .orn.draw::after { transform: scaleX(0); animation: draw 1.4s cubic-bezier(0.6, 0, 0.2, 1) forwards; animation-delay: var(--d, 0s); }
+.orn.draw::before { transform-origin: right; }
+.orn.draw::after { transform-origin: left; }
+@keyframes draw { to { transform: scaleX(1); } }
+
+/* Sigiliul cu monogramă */
+.seal { width: min(22vw, 10dvh, 88px); aspect-ratio: 1; color: var(--gold); }
+.seal svg { width: 100%; height: 100%; overflow: visible; }
+.seal .ring-text { transform-origin: 50px 50px; animation: spin 60s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.btn { transition: transform 0.2s, box-shadow 0.25s, opacity 0.2s; }
+.btn:hover:not(:disabled) { transform: translateY(-2px); }
+
+@media (prefers-reduced-motion: reduce) {
+    .rv { opacity: 1; transform: none; filter: none; }
+    .orn.draw::before, .orn.draw::after { transform: none; }
+}

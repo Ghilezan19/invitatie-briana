@@ -3,7 +3,7 @@
     const atmo = document.createElement('div');
     atmo.className = 'atmo';
     atmo.setAttribute('aria-hidden', 'true');
-    atmo.innerHTML = '<div class="photo"></div><div class="glow"></div><div class="fog"></div><div class="fog f2"></div><div class="vignette"></div>';
+    atmo.innerHTML = '<div class="photo"></div><div class="glow"></div><div class="spot"></div><div class="fog"></div><div class="fog f2"></div><div class="vignette"></div><div class="grain"></div>';
 
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!reduced) {
@@ -30,4 +30,31 @@
         });
     }
     document.body.prepend(atmo);
+
+    // După intrare, elementul revine la stilurile lui normale (hover, strălucire)
+    document.querySelectorAll('.rv').forEach(el => el.addEventListener('animationend', e => {
+        if (e.target === el && e.animationName === 'reveal') el.classList.remove('rv');
+    }));
+
+    if (reduced) return;
+    const root = document.documentElement;
+
+    // Lumina urmărește degetul / mouse-ul, fundalul se mișcă ușor (paralaxă)
+    function point(x, y) {
+        root.style.setProperty('--mx', x + 'px');
+        root.style.setProperty('--my', y + 'px');
+        root.style.setProperty('--px', ((x / innerWidth) - 0.5) * -18 + 'px');
+        root.style.setProperty('--py', ((y / innerHeight) - 0.5) * -12 + 'px');
+    }
+    addEventListener('pointermove', e => point(e.clientX, e.clientY), { passive: true });
+    addEventListener('pointerdown', e => point(e.clientX, e.clientY), { passive: true });
+
+    // Pe telefon: înclinarea mișcă fundalul
+    addEventListener('deviceorientation', e => {
+        if (e.gamma == null) return;
+        const gx = Math.max(-25, Math.min(25, e.gamma)) / 25;
+        const gy = Math.max(-25, Math.min(25, e.beta - 45)) / 25;
+        root.style.setProperty('--px', gx * -14 + 'px');
+        root.style.setProperty('--py', gy * -10 + 'px');
+    }, { passive: true });
 })();
