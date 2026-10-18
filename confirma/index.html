@@ -206,12 +206,23 @@
             60% { opacity: 1; }
             100% { opacity: 1; transform: scale(1) rotate(-8deg); }
         }
-        .done .ok { color: var(--gold); }
+        .done .ok { display: none; }
+
+        /* După confirmare: doar sigiliul, mesajul și două linkuri discrete */
+        .card.is-done .title,
+        .card.is-done > .orn { display: none; }
+        .card.is-done .done { padding: clamp(1rem, 3dvh, 1.8rem) 0 0.4rem; }
+        .card.is-done .wax { margin-bottom: 2.4dvh; }
+        .card.is-done .foot { border-top: none; margin-top: 1.4rem; padding-top: 0; display: flex; justify-content: center; gap: 1.6rem; }
+        .card.is-done .wall-link { padding: 0.4rem 0; border: none; border-radius: 0; color: var(--gold); }
+        .card.is-done .wall-link:hover { background: none; color: var(--gold-2); }
+        .card.is-done .wall-link b { color: inherit; }
         .done h2 { margin: 0.5rem 0; font-family: var(--serif); font-style: italic; font-weight: 500; font-size: min(10vw, 6dvh, 2.6rem); line-height: 1.05; }
         .done h2 .o { font-style: normal; font-family: var(--display); font-weight: 700; font-size: 0.85em; background: var(--gold-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .done p.txt { font-family: var(--serif); font-size: 1.15rem; color: var(--muted); line-height: 1.4; }
-        .done .again { margin-top: 1rem; background: none; border: none; color: var(--muted); cursor: pointer; }
-        .done .again:hover { color: var(--gold-2); }
+        .done p.txt { max-width: 30ch; margin: 0 auto; font-family: var(--serif); font-size: 1.15rem; color: var(--muted); line-height: 1.4; }
+        .again { padding: 0.4rem 0; background: none; border: none; color: var(--muted); cursor: pointer; transition: color 0.2s; }
+        .again:hover { color: var(--gold-2); }
+        .again[hidden] { display: none; }
 
         /* Lista de monștri */
         .wall {
@@ -365,11 +376,11 @@
             <p class="ok caps" id="doneNo">Confirmat ✓</p>
             <h2 id="doneTitle">Ne vedem <span class="o">pe 31!</span></h2>
             <p class="txt" id="doneText"></p>
-            <button type="button" class="again caps" id="againBtn">Trimite alt răspuns</button>
         </div>
 
         <div class="foot">
             <button type="button" class="wall-link caps" id="wallBtn">👀 Lista de monștri <b id="wallCount"></b></button>
+            <button type="button" class="again caps" id="againBtn" hidden>Alt răspuns</button>
         </div>
     </div>
 </main>
@@ -483,10 +494,12 @@
         $('doneNo').textContent = yes ? 'Confirmat ✓' : 'Am notat';
         $('doneTitle').innerHTML = yes ? 'Ne vedem <span class="o">pe 31!</span>' : 'Păcat… <span class="o">poate altă dată</span>';
         $('doneText').textContent = yes
-            ? `${entry.name}, te-am trecut cu ${partyLabel(entry)}. Pregătiți costumele!`
-            : `${entry.name}, îți mulțumim că ne-ai anunțat.`;
+            ? `Te-am trecut cu ${partyLabel(entry)}. Pregătiți costumele!`
+            : 'Îți mulțumim că ne-ai anunțat.';
         $('form').classList.add('off');
         $('done').classList.add('show');
+        document.querySelector('.card').classList.add('is-done');
+        $('againBtn').hidden = false;
         if (celebrate && yes) buzz([20, 40, 20]);
     }
 
@@ -501,6 +514,8 @@
         renderCounts(); validate();
         $('done').classList.remove('show');
         $('form').classList.remove('off');
+        document.querySelector('.card').classList.remove('is-done');
+        $('againBtn').hidden = true;
     });
 
     // Lista de monștri
