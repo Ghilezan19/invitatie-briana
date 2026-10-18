@@ -432,12 +432,60 @@
         creak(t0 + 0.95);
     }
 
+    // Safari (Mac/iPhone) e strict cu Web Audio, așa că sunetul se generează
+    // o dată, la încărcare, într-un WAV în memorie și se redă ca un clip audio.
+    let doorAudio = null;
+    (async function prepareDoorAudio() {
+        try {
+            const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+            if (!OAC || !document.getElementById('intro')) return;
+            const sr = 44100;
+            const off = new OAC(1, sr * 3, sr);
+            buildDoorSounds(off, 0.03);
+            const rendered = await new Promise((res, rej) => {
+                const p = off.startRendering();
+                if (p && p.then) p.then(res, rej); else off.oncomplete = e => res(e.renderedBuffer);
+            });
+            const url = URL.createObjectURL(toWav(rendered.getChannelData(0), sr));
+            doorAudio = new Audio(url);
+            doorAudio.preload = 'auto';
+            doorAudio.setAttribute('playsinline', '');
+            doorAudio.load();
+        } catch (e) { console.warn('Sunetul ușii nu s-a putut pregăti', e); }
+    })();
+
+    function toWav(samples, sr) {
+        const buf = new ArrayBuffer(44 + samples.length * 2);
+        const v = new DataView(buf);
+        const str = (o, t) => [...t].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+        str(0, 'RIFF'); v.setUint32(4, 36 + samples.length * 2, true); str(8, 'WAVE');
+        str(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+        v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+        str(36, 'data'); v.setUint32(40, samples.length * 2, true);
+        for (let i = 0; i < samples.length; i++) {
+            const x = Math.max(-1, Math.min(1, samples[i]));
+            v.setInt16(44 + i * 2, x < 0 ? x * 0x8000 : x * 0x7fff, true);
+        }
+        return new Blob([buf], { type: 'audio/wav' });
+    }
+
     function doorSounds() {
+        if (doorAudio) {
+            doorAudio.currentTime = 0;
+            const p = doorAudio.play();
+            if (p && p.catch) p.catch(liveDoorSounds);
+            return;
+        }
+        liveDoorSounds();
+    }
+
+    // Rezervă: generare directă (dacă WAV-ul nu e gata încă)
+    function liveDoorSounds() {
         const AC = window.AudioContext || window.webkitAudioContext;
         if (!AC) return;
+        try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
         const ctx = new AC();
         const go = () => buildDoorSounds(ctx, ctx.currentTime + 0.03);
-        // unele browsere pornesc contextul audio „suspendat”
         if (ctx.state === 'suspended') ctx.resume().then(go, go); else go();
         setTimeout(() => ctx.close(), 3500);
     }
