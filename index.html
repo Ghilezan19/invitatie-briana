@@ -235,6 +235,11 @@
     <button type="button" class="btn knock-btn" id="knockBtn">Ciocănește la ușă</button>
 </div>
 
+<audio id="knockAudio" preload="auto" playsinline>
+    <source src="knock.m4a?v=3" type="audio/mp4">
+    <source src="knock.wav?v=3" type="audio/wav">
+</audio>
+
 <main class="screen">
     <div class="bar top caps">
         <div class="orn" style="width:100%">
@@ -345,149 +350,15 @@
     if (seen || matchMedia('(prefers-reduced-motion: reduce)').matches) intro.remove();
     else document.body.classList.add('door-wait');
 
-    // Sunete generate în browser: ciocănit în lemn și scârțâit de ușă
-    function buildDoorSounds(ctx, t0) {
-        const comp = ctx.createDynamicsCompressor();
-        comp.threshold.value = -18;
-        comp.ratio.value = 4;
-        const master = ctx.createGain();
-        master.gain.value = 0.9;
-        comp.connect(master).connect(ctx.destination);
-
-        // ecou scurt, ca într-un hol de castel
-        const delay = ctx.createDelay();
-        delay.delayTime.value = 0.09;
-        const fb = ctx.createGain();
-        fb.gain.value = 0.28;
-        delay.connect(fb).connect(delay);
-        delay.connect(comp);
-
-        const noiseBuf = (sec) => {
-            const len = Math.floor(ctx.sampleRate * sec);
-            const b = ctx.createBuffer(1, len, ctx.sampleRate);
-            const d = b.getChannelData(0);
-            for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
-            return b;
-        };
-
-        function knock(t, s = 1) {
-            // corpul lemnului (frecvențe care se aud și pe difuzoare mici)
-            [[420, 180, 0.7], [260, 120, 0.6]].forEach(([f1, f2, a]) => {
-                const o = ctx.createOscillator();
-                const g = ctx.createGain();
-                o.type = 'triangle';
-                o.frequency.setValueAtTime(f1, t);
-                o.frequency.exponentialRampToValueAtTime(f2, t + 0.08);
-                g.gain.setValueAtTime(0.0001, t);
-                g.gain.exponentialRampToValueAtTime(a * s, t + 0.003);
-                g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
-                o.connect(g); g.connect(comp); g.connect(delay);
-                o.start(t); o.stop(t + 0.18);
-            });
-            // pocnetul încheieturilor pe lemn
-            const n = ctx.createBufferSource();
-            n.buffer = noiseBuf(0.07);
-            const f = ctx.createBiquadFilter();
-            f.type = 'bandpass';
-            f.frequency.value = 1600;
-            f.Q.value = 0.9;
-            const ng = ctx.createGain();
-            ng.gain.value = 1.1 * s;
-            n.connect(f).connect(ng);
-            ng.connect(comp); ng.connect(delay);
-            n.start(t);
-        }
-
-        function creak(t) {
-            const o = ctx.createOscillator();
-            const f = ctx.createBiquadFilter();
-            const g = ctx.createGain();
-            o.type = 'sawtooth';
-            o.frequency.setValueAtTime(180, t);
-            o.frequency.linearRampToValueAtTime(260, t + 0.35);
-            o.frequency.linearRampToValueAtTime(150, t + 0.8);
-            o.frequency.linearRampToValueAtTime(210, t + 1.2);
-            const lfo = ctx.createOscillator();
-            const lg = ctx.createGain();
-            lfo.type = 'square';
-            lfo.frequency.value = 28;
-            lg.gain.value = 35;
-            lfo.connect(lg).connect(o.frequency);
-            f.type = 'bandpass';
-            f.frequency.value = 1400;
-            f.Q.value = 3;
-            g.gain.setValueAtTime(0.0001, t);
-            g.gain.exponentialRampToValueAtTime(0.5, t + 0.12);
-            g.gain.setValueAtTime(0.5, t + 0.95);
-            g.gain.exponentialRampToValueAtTime(0.0001, t + 1.4);
-            o.connect(f).connect(g).connect(comp);
-            o.start(t); lfo.start(t);
-            o.stop(t + 1.45); lfo.stop(t + 1.45);
-        }
-
-        knock(t0, 1);
-        knock(t0 + 0.2, 0.8);
-        knock(t0 + 0.47, 1);
-        knock(t0 + 0.67, 0.8);
-        creak(t0 + 0.95);
-    }
-
-    // Safari (Mac/iPhone) e strict cu Web Audio, așa că sunetul se generează
-    // o dată, la încărcare, într-un WAV în memorie și se redă ca un clip audio.
-    let doorAudio = null;
-    (async function prepareDoorAudio() {
-        try {
-            const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
-            if (!OAC || !document.getElementById('intro')) return;
-            const sr = 44100;
-            const off = new OAC(1, sr * 3, sr);
-            buildDoorSounds(off, 0.03);
-            const rendered = await new Promise((res, rej) => {
-                const p = off.startRendering();
-                if (p && p.then) p.then(res, rej); else off.oncomplete = e => res(e.renderedBuffer);
-            });
-            const url = URL.createObjectURL(toWav(rendered.getChannelData(0), sr));
-            doorAudio = new Audio(url);
-            doorAudio.preload = 'auto';
-            doorAudio.setAttribute('playsinline', '');
-            doorAudio.load();
-        } catch (e) { console.warn('Sunetul ușii nu s-a putut pregăti', e); }
-    })();
-
-    function toWav(samples, sr) {
-        const buf = new ArrayBuffer(44 + samples.length * 2);
-        const v = new DataView(buf);
-        const str = (o, t) => [...t].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
-        str(0, 'RIFF'); v.setUint32(4, 36 + samples.length * 2, true); str(8, 'WAVE');
-        str(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
-        v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
-        str(36, 'data'); v.setUint32(40, samples.length * 2, true);
-        for (let i = 0; i < samples.length; i++) {
-            const x = Math.max(-1, Math.min(1, samples[i]));
-            v.setInt16(44 + i * 2, x < 0 ? x * 0x8000 : x * 0x7fff, true);
-        }
-        return new Blob([buf], { type: 'audio/wav' });
-    }
-
+    // Sunetul ușii: fișier audio real (merge și în Safari pe Mac/iPhone)
+    const knockAudio = document.getElementById('knockAudio');
     function doorSounds() {
-        if (doorAudio) {
-            doorAudio.currentTime = 0;
-            const p = doorAudio.play();
-            if (p && p.catch) p.catch(liveDoorSounds);
-            return;
-        }
-        liveDoorSounds();
-    }
-
-    // Rezervă: generare directă (dacă WAV-ul nu e gata încă)
-    function liveDoorSounds() {
-        const AC = window.AudioContext || window.webkitAudioContext;
-        if (!AC) return;
-        try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
-        const ctx = new AC();
-        const go = () => buildDoorSounds(ctx, ctx.currentTime + 0.03);
-        if (ctx.state === 'suspended') ctx.resume().then(go, go); else go();
-        setTimeout(() => ctx.close(), 3500);
+        if (!knockAudio) return;
+        try {
+            knockAudio.currentTime = 0;
+            const p = knockAudio.play();
+            if (p && p.catch) p.catch(e => console.warn('Sunetul nu a pornit', e));
+        } catch (e) {}
     }
 
     function openDoor() {
