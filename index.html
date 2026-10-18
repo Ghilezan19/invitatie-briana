@@ -115,12 +115,6 @@
         }
         .intro.knock .toc { opacity: 1; transform: none; }
         .knock-btn { width: auto; padding-inline: 2rem; }
-        .skip {
-            background: none; border: none;
-            color: var(--muted);
-            cursor: pointer;
-        }
-        .skip:hover { color: var(--gold-2); }
 
         /* Animația paginii așteaptă până se deschide ușa */
         /* Pagina apare toată deodată, după ce s-au încărcat fonturile */
@@ -239,7 +233,6 @@
         <span class="toc">toc, toc…</span>
     </div>
     <button type="button" class="btn knock-btn" id="knockBtn">Ciocănește la ușă</button>
-    <button type="button" class="skip caps" id="skipBtn">sari peste</button>
 </div>
 
 <main class="screen">
@@ -352,9 +345,84 @@
     if (seen || matchMedia('(prefers-reduced-motion: reduce)').matches) intro.remove();
     else document.body.classList.add('door-wait');
 
-    function openDoor(fast) {
+    // Sunete generate în browser: ciocănit în lemn și scârțâit de ușă
+    function doorSounds() {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        const ctx = new AC();
+        const out = ctx.createGain();
+        out.gain.value = 0.9;
+        out.connect(ctx.destination);
+
+        function knock(t, strength = 1) {
+            // bufnitura (lemn gros)
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.type = 'sine';
+            o.frequency.setValueAtTime(190, t);
+            o.frequency.exponentialRampToValueAtTime(70, t + 0.12);
+            g.gain.setValueAtTime(0.0001, t);
+            g.gain.exponentialRampToValueAtTime(0.9 * strength, t + 0.004);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+            o.connect(g).connect(out);
+            o.start(t); o.stop(t + 0.2);
+
+            // pocnetul (contactul cu ușa)
+            const len = Math.floor(ctx.sampleRate * 0.05);
+            const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+            const d = buf.getChannelData(0);
+            for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 4);
+            const n = ctx.createBufferSource();
+            n.buffer = buf;
+            const f = ctx.createBiquadFilter();
+            f.type = 'bandpass';
+            f.frequency.value = 900;
+            f.Q.value = 1.2;
+            const ng = ctx.createGain();
+            ng.gain.value = 0.6 * strength;
+            n.connect(f).connect(ng).connect(out);
+            n.start(t);
+        }
+
+        function creak(t) {
+            const o = ctx.createOscillator();
+            const f = ctx.createBiquadFilter();
+            const g = ctx.createGain();
+            o.type = 'sawtooth';
+            o.frequency.setValueAtTime(95, t);
+            o.frequency.linearRampToValueAtTime(140, t + 0.35);
+            o.frequency.linearRampToValueAtTime(80, t + 0.8);
+            o.frequency.linearRampToValueAtTime(115, t + 1.2);
+            // tremurul lemnului
+            const lfo = ctx.createOscillator();
+            const lg = ctx.createGain();
+            lfo.frequency.value = 23;
+            lg.gain.value = 18;
+            lfo.connect(lg).connect(o.frequency);
+            f.type = 'bandpass';
+            f.frequency.value = 1100;
+            f.Q.value = 6;
+            g.gain.setValueAtTime(0.0001, t);
+            g.gain.exponentialRampToValueAtTime(0.22, t + 0.15);
+            g.gain.setValueAtTime(0.22, t + 0.9);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 1.35);
+            o.connect(f).connect(g).connect(out);
+            o.start(t); lfo.start(t);
+            o.stop(t + 1.4); lfo.stop(t + 1.4);
+        }
+
+        const now = ctx.currentTime + 0.02;
+        knock(now, 1);
+        knock(now + 0.2, 0.85);
+        knock(now + 0.47, 1);
+        knock(now + 0.67, 0.85);
+        creak(now + 0.95);
+        setTimeout(() => ctx.close(), 3000);
+    }
+
+    function openDoor() {
         try { sessionStorage.setItem('briana-door', '1'); } catch (e) {}
-        if (fast) { intro.remove(); document.body.classList.remove('door-wait'); return; }
+        try { doorSounds(); } catch (e) {}
         intro.classList.add('knock');
         setTimeout(() => {
             intro.classList.remove('knock');
@@ -363,8 +431,7 @@
             setTimeout(() => intro.remove(), 1900);
         }, 950);
     }
-    document.getElementById('knockBtn')?.addEventListener('click', () => openDoor(false), { once: true });
-    document.getElementById('skipBtn')?.addEventListener('click', () => openDoor(true));
+    document.getElementById('knockBtn')?.addEventListener('click', openDoor, { once: true });
 </script>
 </body>
 </html>
