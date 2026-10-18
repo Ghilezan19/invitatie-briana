@@ -15,8 +15,9 @@
 
         .card {
             padding: clamp(1.1rem, 3dvh, 1.8rem) clamp(1rem, 5vw, 1.6rem);
-            animation: page-in 0.6s ease both;
+            transition: opacity 0.6s ease;
         }
+        body.loading .card { opacity: 0; }
         @keyframes page-in { from { opacity: 0; } }
 
         .card-top { display: flex; align-items: center; justify-content: space-between; color: var(--muted); }
@@ -278,7 +279,7 @@
         .empty { grid-column: 1 / -1; padding: 1.5rem 0; text-align: center; color: var(--muted); }
     </style>
 </head>
-<body class="sub">
+<body class="sub loading">
 
 <main class="screen">
     <div class="card frame">
@@ -392,6 +393,9 @@
 <script src="../atmosphere.js"></script>
 <script src="../db.js"></script>
 <script>
+    Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1500))])
+        .then(() => document.body.classList.remove('loading'));
+
     const $ = id => document.getElementById(id);
     const state = { response: null, adults: 1, kids: 0 };
     const nm = $('name');

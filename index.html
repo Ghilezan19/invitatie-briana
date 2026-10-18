@@ -123,9 +123,9 @@
         .skip:hover { color: var(--gold-2); }
 
         /* Animația paginii așteaptă până se deschide ușa */
-        main.screen { animation: page-in 0.7s ease both; }
-        body.door-wait main.screen { animation: none; opacity: 0; }
-        @keyframes page-in { from { opacity: 0; } }
+        /* Pagina apare toată deodată, după ce s-au încărcat fonturile */
+        main.screen { transition: opacity 0.6s ease; }
+        body.loading main.screen, body.door-wait main.screen { opacity: 0; }
 
         /* ---------- Invitația ---------- */
         .top { justify-content: center; color: var(--gold); }
@@ -225,7 +225,7 @@
         }
     </style>
 </head>
-<body>
+<body class="loading">
 
 <div class="intro" id="intro">
     <p class="intro-pre">Cineva te așteaptă înăuntru…</p>
@@ -315,6 +315,10 @@
 
 <script src="atmosphere.js"></script>
 <script>
+    // Arată pagina abia când fonturile sunt gata (maxim 1,5 s de așteptare)
+    Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1500))])
+        .then(() => document.body.classList.remove('loading'));
+
     // Numărătoare inversă (ora României, UTC+2 după 25 octombrie)
     const PARTY = new Date('2026-10-31T14:00:00+02:00').getTime();
     const pad = n => String(n).padStart(2, '0');
