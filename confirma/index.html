@@ -66,6 +66,18 @@
             transition: border-color 0.2s;
         }
         .line-input:focus { border-color: var(--gold); }
+        /* Completarea automată din browser: păstrăm același aspect ca la scris */
+        .line-input:-webkit-autofill,
+        .line-input:-webkit-autofill:hover,
+        .line-input:-webkit-autofill:focus {
+            -webkit-text-fill-color: var(--ink);
+            caret-color: var(--ink);
+            font-family: var(--serif);
+            font-size: min(8vw, 4.6dvh, 2.2rem);
+            transition: background-color 99999s ease 0s;
+            -webkit-box-shadow: 0 0 0 1000px transparent inset;
+        }
+        .line-input:autofill { background: transparent; }
         .line-input::placeholder { color: rgba(243, 233, 216, 0.22); font-style: italic; }
         textarea.line-input { resize: none; height: 17dvh; line-height: 1.25; font-size: min(6vw, 3.4dvh, 1.6rem); }
         .hint { margin-top: 1rem; color: var(--muted); font-size: 0.56rem; }
